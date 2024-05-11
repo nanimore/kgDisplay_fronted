@@ -1,6 +1,6 @@
 <template>
   <div class="app-container home">
-    欢迎进入知识图谱标注系统
+    欢迎进入知识图谱标注系统1
   </div>
 </template>
 
