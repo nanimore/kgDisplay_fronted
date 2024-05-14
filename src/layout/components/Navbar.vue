@@ -27,8 +27,9 @@
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <img src="../../assets/images/image.png" class="user-avatar">
-          <!-- <i class="el-icon-caret-bottom" /> -->
+          <img src="../../assets/images/u11.svg" class="user-avatar">
+          <span class="username">蔡徐坤</span>
+          <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
           <!-- <router-link to="/user/profile">
@@ -115,7 +116,7 @@ export default {
   height: 50px;
   overflow: hidden;
   position: relative;
-  background: #fff;
+  background: #002a3c;
   box-shadow: 0 1px 4px rgba(0,21,41,.08);
 
   .hamburger-container {
@@ -176,25 +177,32 @@ export default {
       margin-right: 15px;
 
       .avatar-wrapper {
-        margin-top: 10px;
         position: relative;
-
         .user-avatar {
           cursor: pointer;
           width: 30px;
           height: 30px;
-          border-radius: 10px;
+          border-radius: 50%;
+          margin-top: 10px;
         }
 
         .el-icon-caret-bottom {
+          color: white;
           cursor: pointer;
           position: absolute;
           right: -20px;
-          top: 25px;
-          font-size: 12px;
+          top: 9px;
+          font-size: 16px;
         }
       }
     }
   }
+}
+.username{
+  font-size: 14px;
+  color: white;
+  height: 50px;
+  line-height: 50px;
+  display: inline-block;
 }
 </style>

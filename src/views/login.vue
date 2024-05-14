@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
-      <h3 class="title">若依后台管理系统</h3>
+      <h2 class="title">知识图谱标注系统</h2>
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
@@ -40,6 +40,7 @@
         </div>
       </el-form-item>
     </el-form>
+    <!--  底部  -->
   </div>
 </template>
 
@@ -51,10 +52,9 @@ export default {
   name: "Login",
   data() {
     return {
-      codeUrl: "",
       loginForm: {
-        username: "admin",
-        password: "admin123",
+        username: "",
+        password: "",
         rememberMe: false,
       },
       loginRules: {
@@ -67,7 +67,7 @@ export default {
       },
       loading: false,
       // 验证码开关
-      captchaEnabled: true,
+      captchaEnabled: false,
       // 注册开关
       register: false,
       redirect: undefined
@@ -112,9 +112,6 @@ export default {
             this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
           }).catch(() => {
             this.loading = false;
-            if (this.captchaEnabled) {
-              this.getCode();
-            }
           });
         }
       });
@@ -129,7 +126,7 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-image: url("../assets/images/login-background.jpg");
+  background-color: rgba(13,13,13,1);
   background-size: cover;
 }
 .title {
