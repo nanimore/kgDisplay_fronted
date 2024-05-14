@@ -33,7 +33,7 @@ export default {
 .title{
   position: fixed;
   top: 47%;
-  left: 53%;
+  left: 55%;
   transform: translate(-50%, -50%);
   font-weight: 700;
   letter-spacing: 5px;
