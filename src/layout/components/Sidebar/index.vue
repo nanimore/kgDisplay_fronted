@@ -146,7 +146,7 @@
                         <i class="el-icon-share"></i>
                         <span>图谱数据管理</span>
                     </template>
-                    <el-menu-item>
+                    <el-menu-item index="5-1">
                         <span>实例管理</span>
                     </el-menu-item>
                 </el-submenu>
@@ -237,22 +237,29 @@ import SidebarItem from "./SidebarItem";
 import variables from "@/assets/styles/variables.scss";
 
 export default {
+    mounted(){
+        console.log(this.roles)
+        if(this.roles == 0){
+            this.$store.dispatch("ChangeRoles", false).then(() => {
+                }).catch(() => {
+            });    
+        }
+    },
     data(){
         return{
-            isAdmin:true,
             menuItems: [
                 { name: '首页', route: '/index', roles: ['user'],icon:"el-icon-s-home" },
                 { name: '实例数据', route: '/users', roles: ['user'], icon:"el-icon-document-copy"},
                 { name: '个人详情', route: '/settings', roles: ['user'] , icon:"el-icon-user"},
                 // 其他菜单项
             ],
-            userRole: 'user' // 示例角色，实际应用中应从后端或Vuex中获取
+            userRole: 'user', // 示例角色，实际应用中应从后端或Vuex中获取，
         }
     },
     components: { SidebarItem, Logo },
     computed: {
         ...mapState(["settings"]),
-        ...mapGetters(["sidebarRouters", "sidebar"]),
+        ...mapGetters(["sidebarRouters", "sidebar",'isAdmin','roles']),
         showLogo() {
             return this.$store.state.settings.sidebarLogo;
         },
