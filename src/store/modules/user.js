@@ -8,7 +8,8 @@ const user = {
     name: '',
     avatar: '',
     roles: [],
-    permissions: []
+    permissions: [],
+    isAdmin: true
   },
 
   mutations: {
@@ -29,6 +30,9 @@ const user = {
     },
     SET_PERMISSIONS: (state, permissions) => {
       state.permissions = permissions
+    },
+    SET_ADMIN: (state, isAdmin) => {
+      state.isAdmin = isAdmin
     }
   },
 
@@ -79,7 +83,16 @@ const user = {
         removeToken()
         resolve()
       })
+    },
+    // 修改角色
+    ChangeRoles({ commit },data) {
+      return new Promise(resolve => {
+        console.log(data)
+        commit('SET_ADMIN', data)
+        resolve()
+      })
     }
+    
   }
 }
 

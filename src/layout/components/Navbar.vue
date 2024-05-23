@@ -4,22 +4,23 @@
 
     <!-- <breadcrumb id="breadcrumb-container" class="breadcrumb-container" v-if="!topNav"/> -->
     <top-nav id="topmenu-container" class="topmenu-container" v-if="topNav"/>
-
-    <div class="right-menu">
-
+    <div class="right-menu" style="display: flex;">
+      <el-switch
+            v-if="roles==1"
+            active-text="切换角色"
+            v-model="changeRoles1"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            @change="changeRoles"
+            style="margin-top:17px;">
+      </el-switch>
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <img src="../../assets/images/u11.svg" class="user-avatar">
+          <img src="../../assets/images/u11.svg" class="user-avatar" style="margin-left: 30px;">
           <span class="username">{{name}}</span>
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
-          <!-- <router-link to="/user/profile">
-            <el-dropdown-item>个人中心</el-dropdown-item>
-          </router-link> -->
-          <!-- <el-dropdown-item @click.native="setting = true">
-            <span>布局设置</span>
-          </el-dropdown-item> -->
           <el-dropdown-item  @click.native="changePassword">
             <span>修改密码</span>
           </el-dropdown-item>
@@ -44,6 +45,11 @@ import RuoYiGit from '@/components/RuoYi/Git'
 import RuoYiDoc from '@/components/RuoYi/Doc'
 
 export default {
+  data(){
+    return{
+      changeRoles1:true,
+    }
+  },
   components: {
     Breadcrumb,
     TopNav,
@@ -59,7 +65,8 @@ export default {
       'sidebar',
       'avatar',
       'device',
-      'name'
+      'name',
+      'roles'
     ]),
     setting: {
       get() {
@@ -84,6 +91,12 @@ export default {
     },
     changePassword(){
       this.$router.push('/user/profile');
+    },
+    changeRoles(){
+      this.$store.dispatch("ChangeRoles", this.changeRoles1).then(() => {
+          this.$router.push({ path: this.$route.path, query: { reload: Date.now() } }).catch(err => {});
+        }).catch(() => {
+      });
     },
     async logout() {
       this.$confirm('确定注销并退出系统吗？', '提示', {
