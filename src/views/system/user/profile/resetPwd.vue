@@ -57,6 +57,9 @@ export default {
         if (valid) {
           updateUserPwd(this.user.oldPassword, this.user.newPassword).then(response => {
             this.$modal.msgSuccess("修改成功");
+            setTimeout(() => {  
+              this.$tab.closePage();
+            }, 1000)
           });
         }
       });
