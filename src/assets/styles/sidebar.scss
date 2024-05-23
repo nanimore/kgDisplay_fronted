@@ -74,13 +74,16 @@
       overflow: hidden !important;
       text-overflow: ellipsis !important;
       white-space: nowrap !important;
+      &:hover {
+        background-color: #001529 !important;
+      }
     }
 
     // menu hover
     .submenu-title-noDropdown,
     .el-submenu__title {
       &:hover {
-        background-color: rgba(0, 0, 0, 0.06) !important;
+        background-color: #001529 !important;
       }
     }
 
@@ -99,7 +102,6 @@
 
     & .theme-dark .nest-menu .el-submenu>.el-submenu__title,
     & .theme-dark .el-submenu .el-menu-item {
-      background-color: $base-sub-menu-background !important;
 
       &:hover {
         background-color: $base-sub-menu-hover !important;

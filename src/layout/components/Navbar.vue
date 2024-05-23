@@ -1,34 +1,16 @@
 <template>
   <div class="navbar">
-    <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
+    <!-- <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" /> -->
 
-    <breadcrumb id="breadcrumb-container" class="breadcrumb-container" v-if="!topNav"/>
+    <!-- <breadcrumb id="breadcrumb-container" class="breadcrumb-container" v-if="!topNav"/> -->
     <top-nav id="topmenu-container" class="topmenu-container" v-if="topNav"/>
 
     <div class="right-menu">
-      <!-- <template v-if="device!=='mobile'">
-        <search id="header-search" class="right-menu-item" />
-
-        <el-tooltip content="源码地址" effect="dark" placement="bottom">
-          <ruo-yi-git id="ruoyi-git" class="right-menu-item hover-effect" />
-        </el-tooltip>
-
-        <el-tooltip content="文档地址" effect="dark" placement="bottom">
-          <ruo-yi-doc id="ruoyi-doc" class="right-menu-item hover-effect" />
-        </el-tooltip>
-
-        <screenfull id="screenfull" class="right-menu-item hover-effect" />
-
-        <el-tooltip content="布局大小" effect="dark" placement="bottom">
-          <size-select id="size-select" class="right-menu-item hover-effect" />
-        </el-tooltip>
-
-      </template> -->
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
           <img src="../../assets/images/u11.svg" class="user-avatar">
-          <span class="username">蔡徐坤</span>
+          <span class="username">{{name}}</span>
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -38,7 +20,10 @@
           <!-- <el-dropdown-item @click.native="setting = true">
             <span>布局设置</span>
           </el-dropdown-item> -->
-          <el-dropdown-item  @click.native="logout">
+          <el-dropdown-item  @click.native="changePassword">
+            <span>修改密码</span>
+          </el-dropdown-item>
+          <el-dropdown-item divided @click.native="logout">
             <span>退出登录</span>
           </el-dropdown-item>
         </el-dropdown-menu>
@@ -73,7 +58,8 @@ export default {
     ...mapGetters([
       'sidebar',
       'avatar',
-      'device'
+      'device',
+      'name'
     ]),
     setting: {
       get() {
@@ -96,6 +82,9 @@ export default {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
+    changePassword(){
+      this.$router.push('/user/profile');
+    },
     async logout() {
       this.$confirm('确定注销并退出系统吗？', '提示', {
         confirmButtonText: '确定',
@@ -103,7 +92,7 @@ export default {
         type: 'warning'
       }).then(() => {
         this.$store.dispatch('LogOut').then(() => {
-          location.href = '/index';
+          location.href = '/login';
         })
       }).catch(() => {});
     }
@@ -134,6 +123,7 @@ export default {
 
   .breadcrumb-container {
     float: left;
+    margin-left: 20px;
   }
 
   .topmenu-container {
@@ -174,25 +164,23 @@ export default {
     }
 
     .avatar-container {
-      margin-right: 15px;
-
       .avatar-wrapper {
-        position: relative;
+        display: flex; /* 启用Flexbox */  
+        align-items: center; /* 垂直居中子元素 */  
         .user-avatar {
           cursor: pointer;
           width: 30px;
           height: 30px;
           border-radius: 50%;
-          margin-top: 10px;
         }
-
+        .username{
+          margin-left: 5px;
+        }
         .el-icon-caret-bottom {
           color: white;
           cursor: pointer;
-          position: absolute;
-          right: -20px;
-          top: 9px;
           font-size: 16px;
+          margin-left: 3px;
         }
       }
     }

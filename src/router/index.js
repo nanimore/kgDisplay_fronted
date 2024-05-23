@@ -84,9 +84,41 @@ export const constantRoutes = [
         path: 'profile',
         component: () => import('@/views/system/user/profile/index'),
         name: 'Profile',
-        meta: { title: '个人中心', icon: 'user' }
+        meta: { title: '修改密码'}
+      },
+      {
+        path: 'admin',
+        component: () => import('@/views/User/UserAdmin'),
+        name: 'admin',
+        meta: { title: '用户管理'}
+      },
+    ]
+  },
+  {
+    path: '/data',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'bookUpload',
+        component: () => import('@/views/dataUpload/bookUpload'),
+        name: 'bookUpload',
+        meta: { title: '书籍上传'}
+      },
+      {
+        path: 'wordUpload',
+        component: () => import('@/views/dataUpload/wordUpload'),
+        name: 'wordUpload',
+        meta: { title: '文档上传'}
+      },
+      {
+        path: 'videoUpload',
+        component: () => import('@/views/dataUpload/videoUpload'),
+        name: 'videoUpload',
+        meta: { title: '视频上传'}
       }
     ]
+
   }
 ]
 

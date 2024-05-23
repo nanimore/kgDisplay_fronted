@@ -24,6 +24,9 @@
         </el-input>
       </el-form-item>
       <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
+      <div style="float: right;" v-if="register">
+          <router-link class="link-type" :to="'/register'">立即注册</router-link>
+        </div>
       <el-form-item style="width:100%;">
         <el-button
           :loading="loading"
@@ -35,9 +38,7 @@
           <span v-if="!loading">登 录</span>
           <span v-else>登 录 中...</span>
         </el-button>
-        <div style="float: right;" v-if="register">
-          <router-link class="link-type" :to="'/register'">立即注册</router-link>
-        </div>
+        
       </el-form-item>
     </el-form>
     <!--  底部  -->
@@ -59,17 +60,19 @@ export default {
       },
       loginRules: {
         username: [
-          { required: true, trigger: "blur", message: "请输入您的账号" }
+          { required: true, trigger: "blur", message: "请输入您的账号"},
+          { min:2, trigger: "blur", message: "最小长度为2位"},
         ],
         password: [
-          { required: true, trigger: "blur", message: "请输入您的密码" }
+          { required: true, trigger: "blur", message: "请输入您的密码"},
+          { min:2, trigger: "blur", message: "最小长度为6位"},
         ]
       },
       loading: false,
       // 验证码开关
       captchaEnabled: false,
       // 注册开关
-      register: false,
+      register: true,
       redirect: undefined
     };
   },
@@ -109,7 +112,9 @@ export default {
             Cookies.remove('rememberMe');
           }
           this.$store.dispatch("Login", this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
+            this.$store.dispatch('GetInfo').then(() => {
+              this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
+            })
           }).catch(() => {
             this.loading = false;
           });

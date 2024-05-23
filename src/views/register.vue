@@ -1,7 +1,7 @@
 <template>
   <div class="register">
     <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="register-form">
-      <h3 class="title">若依后台管理系统</h3>
+      <h2 class="title">知识图谱标注系统</h2>
       <el-form-item prop="username">
         <el-input v-model="registerForm.username" type="text" auto-complete="off" placeholder="账号">
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
@@ -18,9 +18,9 @@
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
         </el-input>
       </el-form-item>
-      <el-form-item prop="confirmPassword">
+      <el-form-item prop="checkPassword" style="margin-bottom: 10px;">
         <el-input
-          v-model="registerForm.confirmPassword"
+          v-model="registerForm.checkPassword"
           type="password"
           auto-complete="off"
           placeholder="确认密码"
@@ -29,20 +29,9 @@
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
         </el-input>
       </el-form-item>
-      <el-form-item prop="code" v-if="captchaEnabled">
-        <el-input
-          v-model="registerForm.code"
-          auto-complete="off"
-          placeholder="验证码"
-          style="width: 63%"
-          @keyup.enter.native="handleRegister"
-        >
-          <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
-        </el-input>
-        <div class="register-code">
-          <img :src="codeUrl" @click="getCode" class="register-code-img"/>
-        </div>
-      </el-form-item>
+      <el-form-item style="margin-bottom: 5px;">
+        <router-link class="link-type" style="float: right;" :to="'/login'">使用已有账户登录</router-link>
+      </el-form-item>  
       <el-form-item style="width:100%;">
         <el-button
           :loading="loading"
@@ -54,20 +43,13 @@
           <span v-if="!loading">注 册</span>
           <span v-else>注 册 中...</span>
         </el-button>
-        <div style="float: right;">
-          <router-link class="link-type" :to="'/login'">使用已有账户登录</router-link>
-        </div>
       </el-form-item>
     </el-form>
-    <!--  底部  -->
-    <div class="el-register-footer">
-      <span>Copyright © 2018-2024 ruoyi.vip All Rights Reserved.</span>
-    </div>
   </div>
 </template>
 
 <script>
-import { getCodeImg, register } from "@/api/login";
+import { register } from "@/api/login";
 
 export default {
   name: "Register",
@@ -80,13 +62,10 @@ export default {
       }
     };
     return {
-      codeUrl: "",
       registerForm: {
         username: "",
         password: "",
-        confirmPassword: "",
-        code: "",
-        uuid: ""
+        checkPassword: "",
       },
       registerRules: {
         username: [
@@ -95,32 +74,21 @@ export default {
         ],
         password: [
           { required: true, trigger: "blur", message: "请输入您的密码" },
-          { min: 5, max: 20, message: "用户密码长度必须介于 5 和 20 之间", trigger: "blur" },
+          { min: 6, max: 20, message: "用户密码长度必须介于 6 和 20 之间", trigger: "blur" },
           { pattern: /^[^<>"'|\\]+$/, message: "不能包含非法字符：< > \" ' \\\ |", trigger: "blur" }
         ],
-        confirmPassword: [
+        checkPassword: [
           { required: true, trigger: "blur", message: "请再次输入您的密码" },
           { required: true, validator: equalToPassword, trigger: "blur" }
-        ],
-        code: [{ required: true, trigger: "change", message: "请输入验证码" }]
+        ]
       },
       loading: false,
       captchaEnabled: true
     };
   },
   created() {
-    this.getCode();
   },
   methods: {
-    getCode() {
-      getCodeImg().then(res => {
-        this.captchaEnabled = res.captchaEnabled === undefined ? true : res.captchaEnabled;
-        if (this.captchaEnabled) {
-          this.codeUrl = "data:image/gif;base64," + res.img;
-          this.registerForm.uuid = res.uuid;
-        }
-      });
-    },
     handleRegister() {
       this.$refs.registerForm.validate(valid => {
         if (valid) {
@@ -128,16 +96,12 @@ export default {
           register(this.registerForm).then(res => {
             const username = this.registerForm.username;
             this.$alert("<font color='red'>恭喜你，您的账号 " + username + " 注册成功！</font>", '系统提示', {
-              dangerouslyUseHTMLString: true,
               type: 'success'
             }).then(() => {
               this.$router.push("/login");
             }).catch(() => {});
           }).catch(() => {
             this.loading = false;
-            if (this.captchaEnabled) {
-              this.getCode();
-            }
           })
         }
       });
@@ -152,7 +116,7 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100%;
-  background-image: url("../assets/images/login-background.jpg");
+  background-color: rgba(13,13,13,1);
   background-size: cover;
 }
 .title {

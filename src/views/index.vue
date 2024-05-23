@@ -27,7 +27,12 @@ export default {
   font-size: 48px;
   margin: 0 auto;
   color: white;
-  background-color: black;
+  // background-color: black;
+  background-image: url("../assets/images/welcome.gif");
+  background-repeat: no-repeat; /* 不重复背景图像 */  
+  background-size: cover; /* 确保背景图像覆盖整个元素 */  
+  /* 如果GIF图像尺寸小于元素，您可能还想设置背景位置 */  
+  background-position: center center; /* 背景图像居中 */  
   height: calc(100vh - 50px);
 }
 .title{
@@ -37,6 +42,7 @@ export default {
   transform: translate(-50%, -50%);
   font-weight: 700;
   letter-spacing: 5px;
+  color: white;
 }
 </style>
 
