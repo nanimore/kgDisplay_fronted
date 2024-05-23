@@ -39,8 +39,8 @@ const user = {
       const password = userInfo.password
       return new Promise((resolve, reject) => {
         login(username, password).then(res => {
-          setToken(res.token)
-          commit('SET_TOKEN', res.token)
+          setToken(res.data.token)
+          commit('SET_TOKEN', res.data.token)
           resolve()
         }).catch(error => {
           reject(error)
@@ -52,17 +52,8 @@ const user = {
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
         getInfo().then(res => {
-          const user = res.user
-          const avatar = (user.avatar == "" || user.avatar == null) ? require("@/assets/images/profile.jpg") : process.env.VUE_APP_BASE_API + user.avatar;
-          if (res.roles && res.roles.length > 0) { // 验证返回的roles是否是一个非空数组
-            commit('SET_ROLES', res.roles)
-            commit('SET_PERMISSIONS', res.permissions)
-          } else {
-            commit('SET_ROLES', ['ROLE_DEFAULT'])
-          }
-          commit('SET_ID', user.userId)
-          commit('SET_NAME', user.userName)
-          commit('SET_AVATAR', avatar)
+          commit('SET_ROLES', res.data.userRole)
+          commit('SET_NAME', res.data.username)
           resolve(res)
         }).catch(error => {
           reject(error)
@@ -73,15 +64,11 @@ const user = {
     // 退出系统
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           commit('SET_PERMISSIONS', [])
           removeToken()
           resolve()
-        }).catch(error => {
-          reject(error)
-        })
       })
     },
 
