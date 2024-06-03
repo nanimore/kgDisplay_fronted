@@ -23,13 +23,25 @@
             </el-form-item>
             <el-form-item label="文章类别" prop="dataType">
                 <el-select v-model="queryParams.dataType" placeholder="请选择" style="width: 150px;">
-                    <el-option label="舰船" value="舰船"></el-option>
-                    <el-option label="飞行器" value="飞行器"></el-option>
-                    <el-option label="雷达" value="雷达"></el-option>
-                    <el-option-group label="固定目标" value="固定目标">
-                        <el-option label="基地" value="基地"></el-option>
-                        <el-option label="电厂" value="电厂"></el-option>
-                        <el-option label="机场" value="机场"></el-option>
+                    <el-option
+                        v-for="group in initDocCategory"
+                        :key="group.index"
+                        v-if="group.children==null"
+                        :label="group.name"
+                        :value="group.name"
+                    ></el-option>
+                    <el-option-group
+                        v-for="group in initDocCategory"
+                        :key="group.name"
+                        v-if="group.children"
+                        :label="group.name"
+                    >
+                        <el-option
+                        v-for="item in group.children"
+                        :key="item"
+                        :label="item"
+                        :value="item"
+                        ></el-option>
                     </el-option-group>
                 </el-select>
             </el-form-item>
@@ -290,10 +302,8 @@ export default {
     .hidden {
         visibility: hidden;
     }
-    ::v-deep .el-scrollbar .el-select-group__wrap{
-        .el-select-group{
-            padding-left: 15px;
-        }
+    ::v-deep .el-select-group{
+        padding-left: 15px
     }
 </style>
   
