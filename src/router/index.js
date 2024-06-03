@@ -75,15 +75,28 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/GraphAdmin',
+    component: Layout,
+    redirect: 'index',
+    children: [
+      {
+        path: 'entityAdmin',
+        component: () => import('@/views/GraphAdmin/entityAdmin'),
+        name: 'entityAdmin',
+        meta: { title: '实例管理'}
+      }
+    ]
+  },
+  {
     path: '/user',
     component: Layout,
     hidden: true,
     redirect: 'noredirect',
     children: [
       {
-        path: 'profile',
+        path: 'resetPassword',
         component: () => import('@/views/system/user/profile/index'),
-        name: 'Profile',
+        name: 'resetPassword',
         meta: { title: '修改密码'}
       },
       {
@@ -92,6 +105,26 @@ export const constantRoutes = [
         name: 'admin',
         meta: { title: '用户管理'}
       },
+      {
+        path: 'personalData',
+        component: () => import('@/views/User/personalData'),
+        name: 'personalData',
+        meta: { title: '个人详情'}
+      },
+    ]
+  },
+  {
+    path: '/dataLabel',
+    component: Layout,
+    hidden: true,
+    redirect: 'noredirect',
+    children: [
+      {
+        path: 'dataAnnotations',
+        component: () => import('@/views/dataLabel/dataLabel.vue'),
+        name: 'dataAnnotations',
+        meta: { title: '实例数据'}
+      }
     ]
   },
   {
@@ -118,7 +151,6 @@ export const constantRoutes = [
         meta: { title: '视频上传'}
       }
     ]
-
   }
 ]
 

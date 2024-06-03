@@ -11,10 +11,46 @@
   }
 }
 
+.status{
+  padding: 3px 5px;
+  border-radius: 15px;
+  border: 1px solid black;
+  margin-right: 10px;
+}
+.status-1{
+  color: #ffff00;
+  border-color: #ffff00;
+}
+.status-2{
+  color: #ec808d;
+  border-color: #ec808d;
+}
+.status-3{
+  color: #C280FF;
+  border-color: #C280FF;
+}
+.status-4{
+  color: #95F204;
+  border-color: #95F204;
+}
+.status-5{
+  color: #F59A23;
+  border-color: #F59A23;
+}
+.status-6{
+  color: #0000FF;
+  border-color: #0000FF;
+}
+.status-7{
+  color: #81D3F8;
+  border-color: #81D3F8;
+}
 .el-upload__input {
   display: none;
 }
-
+.resetbutton{
+  background-color: #00bfbf;color: white;
+}
 .cell {
   .el-tag {
     margin-right: 0px;

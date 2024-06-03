@@ -21,7 +21,7 @@
             <el-table-column
                 prop="person"
                 label="标注人员"
-                width="180"
+                width="150"
                 align="center">
             </el-table-column>
             <el-table-column
@@ -57,11 +57,13 @@
             <el-table-column
                 prop="triplet1"
                 label="已标注三元组"
+                width="100"
                 align="center">
             </el-table-column>
             <el-table-column
                 prop="triplet2"
                 label="已通过三元组"
+                width="100"
                 align="center">
             </el-table-column>
             <el-table-column
@@ -76,7 +78,7 @@
             </el-table-column>
             <el-table-column
                 label="劳务发放"
-                width="180"
+                width="150"
                 align="center">
                 <template slot-scope="scope">
                     <el-button type="primary" size="small" @click="sendSalary(scope.row)">发放</el-button>

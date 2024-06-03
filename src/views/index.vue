@@ -1,6 +1,7 @@
 <template>
   <div class="app-container home">
-    <span class="title">欢迎进入标注系统</span>
+    <div class="blur-background"></div>
+    <span class="title" style="z-index: 2;">欢迎进入标注系统</span>
   </div>
 </template>
 
@@ -27,13 +28,25 @@ export default {
   font-size: 48px;
   margin: 0 auto;
   color: white;
-  // background-color: black;
+  overflow: hidden;
   background-image: url("../assets/images/welcome.gif");
-  background-repeat: no-repeat; /* 不重复背景图像 */  
-  background-size: cover; /* 确保背景图像覆盖整个元素 */  
-  /* 如果GIF图像尺寸小于元素，您可能还想设置背景位置 */  
-  background-position: center center; /* 背景图像居中 */  
+  background-size: cover;
+  background-position: center;
+  // background-color: black;
   height: calc(100vh - 50px);
+}
+.blur-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: inherit;
+  background-size: inherit;
+  background-position: inherit;
+  filter: blur(4px); /* 调整模糊度 */
+  z-index: 1; /* 保证模糊背景在后面 */
+  pointer-events: none; /* 防止遮挡点击事件 */
 }
 .title{
   position: fixed;

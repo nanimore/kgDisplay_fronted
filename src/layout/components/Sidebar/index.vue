@@ -146,7 +146,7 @@
                         <i class="el-icon-share"></i>
                         <span>图谱数据管理</span>
                     </template>
-                    <el-menu-item index="5-1">
+                    <el-menu-item index="/GraphAdmin/entityAdmin">
                         <span>实例管理</span>
                     </el-menu-item>
                 </el-submenu>
@@ -249,8 +249,8 @@ export default {
         return{
             menuItems: [
                 { name: '首页', route: '/index', roles: ['user'],icon:"el-icon-s-home" },
-                { name: '实例数据', route: '/users', roles: ['user'], icon:"el-icon-document-copy"},
-                { name: '个人详情', route: '/settings', roles: ['user'] , icon:"el-icon-user"},
+                { name: '实例数据', route: '/dataLabel/dataAnnotations', roles: ['user'], icon:"el-icon-document-copy"},
+                { name: '个人详情', route: '/user/personalData', roles: ['user'] , icon:"el-icon-user"},
                 // 其他菜单项
             ],
             userRole: 'user', // 示例角色，实际应用中应从后端或Vuex中获取，

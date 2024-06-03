@@ -89,7 +89,7 @@ export default {
       this.$store.dispatch('app/toggleSideBar')
     },
     changePassword(){
-      this.$router.push('/user/profile');
+      this.$router.push('/user/resetPassword');
     },
     changeRoles(){
       this.$store.dispatch("ChangeRoles", this.changeRoles1).then(() => {
