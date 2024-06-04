@@ -43,9 +43,8 @@
                     <el-upload
                         class="upload-demo"
                         action="https://jsonplaceholder.typicode.com/posts/"
-                        multiple
                         :before-upload="beforeUpload"
-                        :limit="3"
+                        :limit="1"
                         :on-exceed="handleExceed">
                         <el-button size="small" type="primary">点击上传</el-button>
                     </el-upload>
@@ -88,6 +87,54 @@
                 <el-button @click="resetForm('form')">取 消</el-button>
             </div>
         </el-dialog>
+        <el-dialog title="批量上传文档" :visible.sync="multidialogFormVisible" center :close-on-click-modal="false"  width="35%" custom-class="my-dialog">
+            <el-form :model="multiuploadform" ref="multiuploadform" :rules="rules" :label-position="labelPosition"  label-width="140px">
+                <el-form-item label="上传文档" prop="upload">
+                    <el-upload
+                        class="upload-demo"
+                        action="https://jsonplaceholder.typicode.com/posts/"
+                        multiple
+                        :before-upload="beforeUpload"
+                        :limit="3"
+                        :on-exceed="handleExceed">
+                        <el-button size="small" type="primary">点击上传</el-button>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item label="书籍源" prop="booksource">
+                    <el-select v-model="multiuploadform.booksource" placeholder="请选择书籍源">
+                        <el-option label="书籍1" value="书籍1"></el-option>
+                        <el-option label="书籍2" value="书籍2"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="语言" prop="language">
+                    <el-select v-model="multiuploadform.language" placeholder="请选择语言">
+                        <el-option label="中文" value="Chinese"></el-option>
+                        <el-option label="英文" value="English"></el-option>
+                        <el-option label="日文" value="Japanese"></el-option>
+                        <el-option label="韩文" value="Korean"></el-option>
+                        <el-option label="俄文" value="Russian"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="文本是否可以复制" prop="iscopy">
+                    <el-select v-model="multiuploadform.iscopy" placeholder="请选择">
+                        <el-option label="是" value="1"></el-option>
+                        <el-option label="否" value="0"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="目标类型" prop="targettype" style="margin-bottom: 0;">
+                    <el-select v-model="multiuploadform.targettype" placeholder="请选择">
+                        <el-option label="舰船" value="舰船"></el-option>
+                        <el-option label="飞行器" value="飞行器"></el-option>
+                        <el-option label="三" value="3"></el-option>
+                        <el-option label="四" value="4"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer" style="text-align: center;">
+                <el-button type="primary" @click="multiupload('multiuploadform')">上传</el-button>
+                <el-button @click="multiuploadreset('multiuploadform')">取 消</el-button>
+            </div>
+        </el-dialog>
 
         <el-dialog title="编辑书籍" :visible.sync="editdialog" center :close-on-click-modal="false" width="35%" custom-class="my-dialog">
             <el-form :model="form1" ref="editform" :rules="rules" :label-position="labelPosition"  label-width="140px">
@@ -126,7 +173,8 @@
 
         <el-form :model="queryParams" ref="queryParams" :inline="true">
             <el-form-item>
-                <el-button type="primary" @click="dialogFormVisible = true">上传文档</el-button>               
+                <el-button type="primary" @click="dialogFormVisible = true">上传文档</el-button>    
+                <el-button type="primary" @click="multidialogFormVisible = true">批量上传文档</el-button>              
             </el-form-item>
             <el-form-item label="文档名称" prop="wordName">
                 <el-input
@@ -207,7 +255,7 @@
                 </template>
             </el-table-column>
             <el-table-column
-                prop="datatype"
+                prop="targettype"
                 label="数据类型"
                 align="center">
             </el-table-column>
@@ -255,6 +303,7 @@ export default {
   name: "Index",
   data() {
     return {
+        multidialogFormVisible : false,
         multipleSelection: [],
         queryParams: {
             wordName: '',
@@ -283,6 +332,12 @@ export default {
         },
         form1: {
             name: '',
+            language: '',
+            booksource:'',
+            iscopy:'',
+            targettype:''
+        },
+        multiuploadform: {
             language: '',
             booksource:'',
             iscopy:'',
@@ -387,19 +442,35 @@ export default {
             this.$message.success('上传成功!');
             this.resetForm(formName)
             this.dialogFormVisible = false;
+            this.multidialogFormVisible = false;
           } else {
             console.log('error submit!!');
             return false;
           }
         });
-        
+    },
+    multiupload(formName){
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.$message.success('上传成功!');
+            this.resetForm(formName)
+            this.multidialogFormVisible = false;
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+    },
+    multiuploadreset(formName){
+        this.$refs[formName].resetFields();
+        this.multidialogFormVisible = false;
     },
     editForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.$message.success('编辑成功!');
             this.resetForm(formName)
-            this.dialogFormVisible = false;
+            this.editdialog = false;
           } else {
             console.log('error submit!!');
             return false;

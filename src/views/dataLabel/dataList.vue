@@ -1,6 +1,46 @@
 <template>
     <div class="app-container">
+        <el-dialog title="领取数据" :visible.sync="dialogFormVisible" center :close-on-click-modal="false"  width="35%" custom-class="my-dialog">
+            <el-form :model="form" ref="form" :rules="rules" :label-position="labelPosition"  label-width="140px">
+                <el-form-item label="数据源类型" prop="docType">
+                    <el-select v-model="form.docType" placeholder="请选择" filterable >
+                        <el-option v-for="item in initDocTypeList" :label="item" :value="item" :key="item"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="数据类型" prop="dataType">
+                    <el-select v-model="form.dataType" placeholder="请选择"  filterable>
+                        <el-option
+                            v-for="group in initDocCategory"
+                            :key="group.index"
+                            v-if="group.children==null"
+                            :label="group.name"
+                            :value="group.name"
+                        ></el-option>
+                        <el-option-group
+                            v-for="group in initDocCategory"
+                            :key="group.name"
+                            v-if="group.children"
+                            :label="group.name"
+                        >
+                            <el-option
+                            v-for="item in group.children"
+                            :key="item"
+                            :label="item"
+                            :value="item"
+                            ></el-option>
+                        </el-option-group>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="任务数量" prop="worknum" style="margin-bottom: 0;">
+                    <el-input v-model="form.worknum" placeholder="请输入任务数量1-100"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer" style="text-align: center;">
+                <el-button type="primary" @click="submitForm('form')">立即提交</el-button>
+            </div>
+        </el-dialog>
         <el-form :model="queryParams" ref="queryParams" :inline="true">
+
             <el-form-item>
                 <el-button type="primary" @click="dialogFormVisible = true">领取数据</el-button>
             </el-form-item>
@@ -76,13 +116,13 @@
         <div class="newListContainer">
             <div v-for="(item,index) in newDataList" :key="index" style="border-bottom: 1px dashed black;margin-bottom: 10px;">
                 <div class="newsFather" >
-                    <span :class="getStatusClass(item.status)" class="status">{{ getStatusText(item.status) }}</span>
-                    <span>{{item.title}}</span>
+                    <span :class="getStatusClass(item.docStatus)" class="status">{{ getStatusText(item.docStatus) }}</span>
+                    <span style="cursor: pointer;" @click="goToNewsDetail(item.articleId)">{{item.title}}</span>
                     <span class="typeclass">{{item.dataType}}</span>
                 </div>
                 <div class="newsFather " style="font-size: 12px !important;">
                     <span class="adminclass" :class="{ hidden: item.isAdminAssign==0 }">管理员分配</span>
-                    <span>{{item.source}}</span>
+                    <span><a :href="item.url" style="color:#02A7F0;">{{ item.datasourceName }}</a></span>
                     <span>采集时间：{{item.createTime}}</span>
                     <span>分配时间：{{item.assignTime}}</span>
                     <span>发布时间：{{item.publishTime}}</span>
@@ -117,12 +157,29 @@ export default {
     getInitDocCategory(params).then(res=>{
         this.initDocCategory = res.data
     })
+    this.handleQuery()
   },
   data() {
     return {
         initDocTypeList:[],
         pageStatus:1,
         initDocCategory:[],
+        form:{
+            docType:'',
+            worknum:'',
+            dataType:''
+        },
+        rules: {
+        docType: [
+            { required: true, message: '请选择数据源类型'},
+          ],
+          worknum: [
+            { required: true, message: '请选择数据类型'},
+          ],
+          dataType: [
+            { required: true, message: '请输入任务数量'},
+            ]
+        },
         queryParams: {
             keyword: '',
             distributiontime:[],
@@ -133,15 +190,7 @@ export default {
         },
         labelPosition:'right',
         dialogFormVisible: false,
-        newDataList:
-        [{status:1,title:'亚特兰大级轻型巡洋舰',dataType:'舰船',isAdminAssign:1,source:'武器百科',createTime:'2019-10-06   00:00:00',assignTime:'2019-10-06   00:00:00',publishTime:'2019-10-06   00:00:00'},
-        {status:2,title:'亚特兰大级轻型巡洋舰',dataType:'舰船',isAdminAssign:0,source:'武器百科',createTime:'2019-10-06   00:00:00',assignTime:'2019-10-06   00:00:00',publishTime:'2019-10-06   00:00:00'},
-        {status:3,title:'亚特兰大级轻型巡洋舰',dataType:'舰船',isAdminAssign:1,source:'武器百科',createTime:'2019-10-06   00:00:00',assignTime:'2019-10-06   00:00:00',publishTime:'2019-10-06   00:00:00'},
-        {status:4,title:'亚特兰大级轻型巡洋舰',dataType:'舰船',isAdminAssign:0,source:'武器百科',createTime:'2019-10-06   00:00:00',assignTime:'2019-10-06   00:00:00',publishTime:'2019-10-06   00:00:00'},
-        {status:5,title:'亚特兰大级轻型巡洋舰',dataType:'舰船',isAdminAssign:0,source:'武器百科',createTime:'2019-10-06   00:00:00',assignTime:'2019-10-06   00:00:00',publishTime:'2019-10-06   00:00:00'},
-        {status:6,title:'亚特兰大级轻型巡洋舰',dataType:'舰船',isAdminAssign:0,source:'武器百科',createTime:'2019-10-06   00:00:00',assignTime:'2019-10-06   00:00:00',publishTime:'2019-10-06   00:00:00'},
-        {status:7,title:'亚特兰大级轻型巡洋舰',dataType:'舰船',isAdminAssign:0,source:'武器百科',createTime:'2019-10-06   00:00:00',assignTime:'2019-10-06   00:00:00',publishTime:'2019-10-06   00:00:00'}
-        ],
+        newDataList:[],
         currentPage: 1,
         pageSize: 10,
         totalNum: 100,
@@ -179,6 +228,9 @@ export default {
           return '';
       }
     },
+    goToNewsDetail(id){
+        this.$router.push(`newsDetail?=${id}`);  
+    },
     resetQuery(){
         this.resetForm("queryParams")
         this.handleQuery()
@@ -205,12 +257,13 @@ export default {
           createTimeEnd:disendDate,
           publishTimeStart:pubstartDate,
           publishTimeEnd:pubendDate,
-          pageStatus:1,
+          pageStatus:0,
           page:this.currentPage,
           size:this.pageSize
         };
         labelNewsList(params).then(res => {
-            console.log(res)
+            this.newDataList = res.data.docResList
+            this.totalNum = res.data.totalCount
         });
     },
     handleSizeChange(pageSize){
@@ -223,7 +276,6 @@ export default {
     },
     resetForm(formName) {
         this.$refs[formName].resetFields();
-        this.dialogFormVisible = false;
         this.handleQuery()
     },
     formatDate(date) {
@@ -304,6 +356,10 @@ export default {
     }
     ::v-deep .el-select-group{
         padding-left: 15px
+    }
+    .newListContainer{
+        color: white;
+        padding: 0 30px;
     }
 </style>
   

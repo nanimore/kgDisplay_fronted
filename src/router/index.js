@@ -120,11 +120,17 @@ export const constantRoutes = [
     redirect: 'noredirect',
     children: [
       {
-        path: 'dataAnnotations',
-        component: () => import('@/views/dataLabel/dataLabel.vue'),
-        name: 'dataAnnotations',
+        path: 'dataList',
+        component: () => import('@/views/dataLabel/dataList.vue'),
+        name: 'dataList',
         meta: { title: '实例数据'}
-      }
+      },
+      {
+        path: 'newsDetail',
+        component: () => import('@/views/dataLabel/newsDetail.vue'),
+        name: 'newsDetail',
+        meta: { title: '新闻详情'}
+      },
     ]
   },
   {

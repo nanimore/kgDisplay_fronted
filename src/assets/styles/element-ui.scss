@@ -10,12 +10,21 @@
     display: none !important;
   }
 }
-
+.main-container{
+  background-color: #111725;
+}
+.app-container{
+  background-color: #111725;
+}
+.el-form-item__label{
+  color: white;
+}
 .status{
-  padding: 3px 5px;
+  padding: 3px 7px;
   border-radius: 15px;
   border: 1px solid black;
   margin-right: 10px;
+  font-size: 12px;
 }
 .status-1{
   color: #ffff00;

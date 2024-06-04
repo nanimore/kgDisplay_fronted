@@ -249,7 +249,7 @@ export default {
         return{
             menuItems: [
                 { name: '首页', route: '/index', roles: ['user'],icon:"el-icon-s-home" },
-                { name: '实例数据', route: '/dataLabel/dataAnnotations', roles: ['user'], icon:"el-icon-document-copy"},
+                { name: '实例数据', route: '/dataLabel/dataList', roles: ['user'], icon:"el-icon-document-copy"},
                 { name: '个人详情', route: '/user/personalData', roles: ['user'] , icon:"el-icon-user"},
                 // 其他菜单项
             ],
