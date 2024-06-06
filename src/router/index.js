@@ -129,7 +129,8 @@ export const constantRoutes = [
         path: 'newsDetail',
         component: () => import('@/views/dataLabel/newsDetail.vue'),
         name: 'newsDetail',
-        meta: { title: '新闻详情'}
+        meta: { title: '新闻详情'},
+        props: true
       },
     ]
   },

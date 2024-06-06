@@ -85,6 +85,16 @@
                     </el-option-group>
                 </el-select>
             </el-form-item>
+            <el-form-item label="采集时间" prop="createtime">
+                <el-date-picker
+                    v-model="queryParams.createTime"
+                    type="datetimerange"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    style="width: 250px;">
+                </el-date-picker>
+            </el-form-item>
             <el-form-item label="分配时间" prop="distributiontime">
                 <el-date-picker
                     v-model="queryParams.distributiontime"
@@ -117,15 +127,17 @@
             <div v-for="(item,index) in newDataList" :key="index" style="border-bottom: 1px dashed black;margin-bottom: 10px;">
                 <div class="newsFather" >
                     <span :class="getStatusClass(item.docStatus)" class="status">{{ getStatusText(item.docStatus) }}</span>
-                    <span style="cursor: pointer;" @click="goToNewsDetail(item.articleId)">{{item.title}}</span>
-                    <span class="typeclass">{{item.dataType}}</span>
+                    <span style="cursor: pointer;" @click="goToNewsDetail(item)">{{item.title}}</span>
+                    <span class="typeclass" v-if="item.dataType">{{item.dataType}}</span>
                 </div>
                 <div class="newsFather " style="font-size: 12px !important;">
-                    <span class="adminclass" :class="{ hidden: item.isAdminAssign==0 }">管理员分配</span>
+                    <span class="adminclass" v-if="item.isAdminAssign" :class="{ hidden: item.isAdminAssign==0 }">管理员分配</span>
                     <span><a :href="item.url" style="color:#02A7F0;">{{ item.datasourceName }}</a></span>
-                    <span>采集时间：{{item.createTime}}</span>
-                    <span>分配时间：{{item.assignTime}}</span>
-                    <span>发布时间：{{item.publishTime}}</span>
+                    <span v-if="item.createTime">采集时间：{{item.createTime}}</span>
+                    <span v-if="item.assignTime">分配时间：{{item.assignTime}}</span>
+                    <span v-if="item.publishTime">发布时间：{{item.publishTime}}</span>
+                    <span v-if="item.submitTime">标注时间：{{item.submitTime}}</span>
+                    <span v-if="item.reviewTime">审核时间：{{item.reviewTime}}</span>
                 </div>
             </div>
             <div class="block" style="margin-top: 30px;">
@@ -157,7 +169,12 @@ export default {
     getInitDocCategory(params).then(res=>{
         this.initDocCategory = res.data
     })
+    // if(Cookies.get("newListParams")){
+    //     let keyword = Cookies.get("newListParams")
+    //     this.queryParams = JSON.parse(keyword)
+    // }
     this.handleQuery()
+    
   },
   data() {
     return {
@@ -186,7 +203,8 @@ export default {
             dataType:'',
             docType:'',
             publishtime:[],
-            docStatus:1
+            docStatus:1,
+            createTime:[]
         },
         labelPosition:'right',
         dialogFormVisible: false,
@@ -228,8 +246,14 @@ export default {
           return '';
       }
     },
-    goToNewsDetail(id){
-        this.$router.push(`newsDetail?=${id}`);  
+    goToNewsDetail(item){
+        let params ={
+            docId:item.articleId,
+            docPhase:item.docPhase,
+            docType:item.docType
+        }
+        this.$router.push({name:'newsDetail',params:{params}});
+        // Cookies.set('newListParams',JSON.stringify(this.queryParams))
     },
     resetQuery(){
         this.resetForm("queryParams")
@@ -238,23 +262,31 @@ export default {
     handleQuery(){
         let disstartDate ='';
         let disendDate = '';
-        let pubstartDate = ''
-        let pubendDate = ''
+        let pubstartDate = '';
+        let pubendDate = '';
+        let createstartDate = '';
+        let createendtDate = '';
         if(this.queryParams.distributiontime.length === 2){
             disstartDate = this.formatDate(this.queryParams.distributiontime[0]);
             disendDate = this.formatDate(this.queryParams.distributiontime[1]);
         }
         if(this.queryParams.publishtime.length === 2){
-            pubstartDate = this.queryParams.publishtime[0];
-            pubendDate = this.queryParams.publishtime[1];
+            pubstartDate = this.formatDate(this.queryParams.publishtime[0]);
+            pubendDate = this.formatDate(this.queryParams.publishtime[1]);
+        }
+        if(this.queryParams.createTime.length === 2){
+            createstartDate = this.formatDate(this.queryParams.createTime[0]);
+            createendtDate = this.formatDate(this.queryParams.createTime[1]);
         }
         const params = {
           docType: this.queryParams.docType,
           dataType: this.queryParams.dataType,
           keyword:this.queryParams.keyword,
           docStatus:this.queryParams.docStatus,
-          createTimeStart:disstartDate,
-          createTimeEnd:disendDate,
+          assignTimeStart:disstartDate,
+          assignTimeEnd:disendDate,
+          createTimeStart:createstartDate,
+          createTimeEnd:createendtDate,
           publishTimeStart:pubstartDate,
           publishTimeEnd:pubendDate,
           pageStatus:0,
@@ -360,6 +392,9 @@ export default {
     .newListContainer{
         color: white;
         padding: 0 30px;
+    }
+    ::v-deep .el-dialog__body .el-form-item__label{
+        color: black;
     }
 </style>
   
