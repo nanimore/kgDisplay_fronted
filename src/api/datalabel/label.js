@@ -23,7 +23,7 @@ import request from '@/utils/request'
   }
   export function annotationFistPage(query) {
     return request({
-      url: '/AnnotationFistPage',
+      url: '/proofread/AnnotationFirstPage',
       method: 'post',
       data: query
     })
