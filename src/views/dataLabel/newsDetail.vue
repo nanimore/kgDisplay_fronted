@@ -7,7 +7,7 @@
               <span class="passageTitle">{{ passageDetail.title }}</span>
             </div>
             <div class="newsTitleContent1" style="margin-bottom: 5px;font-size: 12px;">
-              <span><a :href="passageDetail.url" style="color:#02A7F0;margin-right: 30px;">武器百科</a></span>
+              <span><a :href="passageDetail.url" style="color:#02A7F0;margin-right: 30px;">{{passageDetail.datasourceName}}</a></span>
               <span style="color: #6498BB;">{{ passageDetail.createTime }}</span>
               <el-button type="primary" size="mini" style="float: right;" @click="dropOutPassage()">丢弃</el-button>
             </div>
