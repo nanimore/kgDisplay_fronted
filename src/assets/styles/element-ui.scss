@@ -19,6 +19,28 @@
 .el-form-item__label{
   color: white;
 }
+.el-dialog {
+  border-radius: 10px !important;
+  // background-color: rgba(2,59,83,1);
+  background-color: rgba(2,45,64,1);
+}
+.el-dialog__header {
+  padding: 10px !important;
+  border-top-left-radius:8px !important;
+  border-top-right-radius:8px !important;
+  background-color: rgba(1,84,120,1);
+  span{
+      color: white !important;
+      padding-bottom: 10px;
+  }
+  .el-dialog__headerbtn{
+      top: 15px;
+      font-size: 20px;
+  }
+}
+.el-dialog__body{
+  
+}
 .status{
   padding: 3px 7px;
   border-radius: 15px;

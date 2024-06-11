@@ -318,22 +318,6 @@ export default {
     .el-select{
         width: 100%;
     }
-    ::v-deep .my-dialog {
-        border-radius: 10px !important;
-        // background-color: rgba(2,59,83,1);
-    }
-    ::v-deep .el-dialog__header {
-        background-color: rgba(1,84,120,1);
-        padding: 10px !important;
-        span{
-            color: white !important;
-            padding-bottom: 10px;
-        }
-        .el-dialog__headerbtn{
-            top: 15px;
-            font-size: 20px;
-        }
-    }
 </style>
   
   

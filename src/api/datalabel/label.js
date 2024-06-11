@@ -1,10 +1,11 @@
 import request from '@/utils/request'
 
   export function labelNewsList(query) {
+    console.log(query)
     return request({
       url: 'articleFilter/getDocList',
-      method: 'get',
-      params: query
+      method: 'post',
+      data: query
     })
   }
   export function getinitDocType(query) {

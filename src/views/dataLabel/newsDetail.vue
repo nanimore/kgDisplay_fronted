@@ -1,5 +1,39 @@
 <template>
     <div class="newListDetailContainer">
+      <el-dialog title="添加实例" :visible.sync="dialogFormVisible"	:modal="false" v-draggable center :close-on-click-modal="false"  width="35%" custom-class="my-dialog">
+            <el-form :model="addEntityForm" ref="addEntityForm" :rules="rules" :label-position="labelPosition"  label-width="100px">
+                <el-form-item :label="selfdefine?'自定义类型：':'实例类型：'" prop="entityType">
+                  <el-select v-if="!selfdefine" v-model="addEntityForm.entityType" filterable placeholder="请选择实例类型" style="width: 300px;">
+                      <el-option label="中文" value="Chinese"></el-option>
+                      <el-option label="英文" value="English"></el-option>
+                      <el-option label="日文" value="Japanese"></el-option>
+                      <el-option label="韩文" value="Korean"></el-option>
+                      <el-option label="俄文" value="Russian"></el-option>
+                  </el-select>
+
+                  <el-input v-else v-model="addEntityForm.entityType" placeholder="请输入内容" style="width: 300px;"></el-input>
+
+                  <span @click="changeSelfDefine()" style="color: #FFFF00;margin-left: 15px;cursor: pointer;font-size: 12px;">自定义类型</span>
+                </el-form-item>
+                <el-form-item label="实例名称：" prop="entityName">
+                    <el-select v-model="addEntityForm.entityName" filterable placeholder="请选择实例名称" style="width: 300px;">
+                        <el-option label="中文" value="Chinese"></el-option>
+                        <el-option label="英文" value="English"></el-option>
+                        <el-option label="日文" value="Japanese"></el-option>
+                        <el-option label="韩文" value="Korean"></el-option>
+                        <el-option label="俄文" value="Russian"></el-option>
+                    </el-select>
+                    <span @click="getNameRegualation()" v-show="!selfdefine" style="color: #FFFF00;margin-left: 15px;cursor: pointer;font-size: 12px;">名称规范示例</span>
+                </el-form-item>
+                <el-form-item label="文本：" prop="text" style="margin-bottom: 0;">
+                    <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;" >
+                    <el-input v-model="addEntityForm.text" style="width: 300px;"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer" style="text-align: center;">
+                <el-button type="primary" @click="submitForm('form')" style="background-color: rgba(0,191,191,1);">立即提交</el-button>
+            </div>
+        </el-dialog>
         <div class="newDetail">
           <div class="newsTitle">
             <div class="newsTitleContent">
@@ -19,7 +53,7 @@
             <el-button type="primary" style="background-color: #03afb0;">抽取文本</el-button>
             <img src='../../assets/images/u1890.svg' @click="back()" style="width: 30px;height: 30px;float: right;cursor: pointer;"></img>
           </div>
-          <div class="addEntity"><img src="../../assets/images/u1895.svg" style="width: 15px;height: 15px;margin-right: 8px;"></img><span>添加实例</span></div>
+          <div class="addEntity" @click="addEntity()"><img src="../../assets/images/u1895.svg" style="width: 15px;height: 15px;margin-right: 8px;"></img><span>添加实例</span></div>
         </div>
     </div>
 </template>
@@ -38,12 +72,36 @@ export default {
   data() {
     return {
         form:{},
-        passageDetail:{}
+        passageDetail:{
+          content:'词向量'
+        },
+        dialogFormVisible:false,
+        selfdefine:false,
+        addEntityForm:{
+          entityType:'',
+          entityName:'',
+          text:''
+        },
+        labelPosition:'right',
+        rules: {
+          entityType: [
+            { required: true, message: '请选择实例类型'},
+          ],
+          entityName: [
+            { required: true, message: '请选择实例名称'},
+          ],
+          text: [
+            { required: true, message: '请输入文本'},
+          ],
+        },
     };
   },
   methods: {
     back(){
       this.$router.back()
+    },
+    addEntity(){
+      this.dialogFormVisible = true
     },
     dropOutPassage(){
       this.$confirm('是否丢弃该文章?', '提示', {
@@ -87,6 +145,13 @@ export default {
         default:
           return '';
       }
+    },
+    changeSelfDefine(){
+      this.addEntityForm.entityType = '';
+      this.selfdefine = !this.selfdefine
+    },
+    getNameRegualation(){
+
     }
   }
 };
@@ -145,5 +210,17 @@ export default {
   height: 70vh;
   overflow-y: scroll;
   font-size: 12px;
+}
+::v-deep .el-dialog{
+  .el-form-item__label{
+    color: #00FFFF;
+    font-weight: 500;
+  }
+}
+::v-deep .el-dialog__wrapper {
+  pointer-events: none; /* 使el-dialog__wrapper不拦截鼠标事件 */
+}
+::v-deep .el-dialog {
+  pointer-events: all; /* 确保el-dialog内部可以交互 */
 }
 </style>
