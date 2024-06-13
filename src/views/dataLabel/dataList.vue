@@ -45,7 +45,7 @@
                 <el-button type="primary" @click="dialogFormVisible = true">领取数据</el-button>
             </el-form-item>
             <el-form-item label="状态" style="margin-left: 10px;" prop="docStatus">
-                <el-radio-group v-model="queryParams.docStatus" fill="#008080" @input="handleQuery()">
+                <el-radio-group v-model="queryParams.docStatus" fill="#008080" @input="onselectChange()">
                     <el-radio-button label="1" >未标注</el-radio-button>
                     <el-radio-button label="2" >已标注</el-radio-button>
                     <el-radio-button label="3" >未通过</el-radio-button>
@@ -85,7 +85,7 @@
                     </el-option-group>
                 </el-select>
             </el-form-item>
-            <el-form-item label="采集时间" prop="createtime">
+            <el-form-item label="采集时间" prop="createTime">
                 <el-date-picker
                     v-model="queryParams.createTime"
                     type="datetimerange"
@@ -136,8 +136,8 @@
                     <span v-if="item.createTime">采集时间：{{item.createTime}}</span>
                     <span v-if="item.assignTime">分配时间：{{item.assignTime}}</span>
                     <span v-if="item.publishTime">发布时间：{{item.publishTime}}</span>
-                    <span v-if="item.submitTime">标注时间：{{item.submitTime}}</span>
-                    <span v-if="item.reviewTime">审核时间：{{item.reviewTime}}</span>
+                    <span v-if="item.submitTime && queryParams.docStatus != 1 && queryParams.docStatus != 2">标注时间：{{item.submitTime }}</span>
+                    <span v-if="item.reviewTime && queryParams.docStatus != 1 && queryParams.docStatus != 2">审核时间：{{item.reviewTime}}</span>
                 </div>
             </div>
             <div class="block" style="margin-top: 30px;">
@@ -302,8 +302,16 @@ export default {
         this.currentPage = currentpage
         this.handleQuery()
     },
+    onselectChange(){
+        const specialFieldValue = this.queryParams.docStatus;
+        this.$refs['queryParams'].resetFields();
+        this.queryParams.docStatus = specialFieldValue
+        this.handleQuery()
+    },
     resetForm(formName) {
+        const specialFieldValue = this.queryParams.docStatus;
         this.$refs[formName].resetFields();
+        this.queryParams.docStatus = specialFieldValue
         this.handleQuery()
     },
     formatDate(date) {
