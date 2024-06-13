@@ -1,8 +1,17 @@
 <template>
     <div class="newListDetailContainer">
       <el-dialog title="添加实例" :visible.sync="dialogFormVisible"	:modal="false" v-draggable center :close-on-click-modal="false"  width="35%" custom-class="my-dialog">
+        <el-dialog
+          width="30%"
+          title="名称规范示例"
+          :visible.sync="innerVisible"
+          center
+          append-to-body>
+          <span style="color: red;">如果要添加的实例名称不在以下规范中，请点击<a style="text-decoration: underline;margin-left: 5px;">新规范</a></span>
+          <p>{{ this.regularText }}</p>
+        </el-dialog>
             <el-form :model="addEntityForm" ref="addEntityForm" :rules="rules" :label-position="labelPosition"  label-width="100px">
-                <el-form-item :label="selfdefine?'自定义类型：':'实例类型：'" prop="entityType">
+                <el-form-item :label="selfdefine?'自定义类型':'实例类型'" prop="entityType">
                   <el-select v-if="!selfdefine" v-model="addEntityForm.entityType" filterable placeholder="请选择实例类型" style="width: 300px;">
                       <el-option label="中文" value="Chinese"></el-option>
                       <el-option label="英文" value="English"></el-option>
@@ -15,7 +24,7 @@
 
                   <span @click="changeSelfDefine()" style="color: #FFFF00;margin-left: 15px;cursor: pointer;font-size: 12px;">自定义类型</span>
                 </el-form-item>
-                <el-form-item label="实例名称：" prop="entityName">
+                <el-form-item label="实例名称" prop="entityName">
                     <el-select v-model="addEntityForm.entityName" filterable placeholder="请选择实例名称" style="width: 300px;">
                         <el-option label="中文" value="Chinese"></el-option>
                         <el-option label="英文" value="English"></el-option>
@@ -25,13 +34,13 @@
                     </el-select>
                     <span @click="getNameRegualation()" v-show="!selfdefine" style="color: #FFFF00;margin-left: 15px;cursor: pointer;font-size: 12px;">名称规范示例</span>
                 </el-form-item>
-                <el-form-item label="文本：" prop="text" style="margin-bottom: 0;">
-                    <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;" >
-                    <el-input v-model="addEntityForm.text" style="width: 300px;"></el-input>
+                <el-form-item label="文本" prop="text" style="margin-bottom: 0;">
+                    <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="startSelecting()">
+                    <el-input v-model="addEntityForm.text" style="width: 275px;"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer" style="text-align: center;">
-                <el-button type="primary" @click="submitForm('form')" style="background-color: rgba(0,191,191,1);">立即提交</el-button>
+                <el-button type="primary" @click="submitForm('addEntityForm')" style="background-color: rgba(0,191,191,1);">立即提交</el-button>
             </div>
         </el-dialog>
         <div class="newDetail">
@@ -40,41 +49,74 @@
               <span :class="getStatusClass(passageDetail.docStatus)" class="status">{{ getStatusText(passageDetail.docStatus) }}</span>
               <span class="passageTitle">{{ passageDetail.title }}</span>
             </div>
-            <div class="newsTitleContent1" style="margin-bottom: 5px;font-size: 12px;">
+            <div class="newsTitleContent1" style="margin-bottom: 5px;font-size: 12px;height: 35px;line-height: 35px;">
               <span><a :href="passageDetail.url" style="color:#02A7F0;margin-right: 30px;">{{passageDetail.datasourceName}}</a></span>
               <span style="color: #6498BB;">{{ passageDetail.createTime }}</span>
-              <el-button type="primary" size="mini" style="float: right;" @click="dropOutPassage()">丢弃</el-button>
+              <span class="newsTitleContentright">
+                <el-input v-model="searchQuery" @input="highlightText" placeholder="" style="width: 150px;" prefix-icon="el-icon-search"></el-input>  
+                <el-button type="primary" size="mini" @click="dropOutPassage()" style="margin-left: 30px;">丢弃</el-button>
+              </span>
             </div>
           </div>
-          <div class="newsContent" v-html="passageDetail.content"></div>
+          <div class="newsContent" v-html="highlightedContent"></div>
         </div>
         <div class="entityDetail">
           <div class="entityTitle">
-            <el-button type="primary" style="background-color: #03afb0;">抽取文本</el-button>
+            <el-button type="primary" style="background-color: #03afb0;" v-loading.fullscreen.lock="fullscreenLoading" @click="extractText()" >抽取文本</el-button>
             <img src='../../assets/images/u1890.svg' @click="back()" style="width: 30px;height: 30px;float: right;cursor: pointer;"></img>
           </div>
           <div class="addEntity" @click="addEntity()"><img src="../../assets/images/u1895.svg" style="width: 15px;height: 15px;margin-right: 8px;"></img><span>添加实例</span></div>
+          <div class="entityListContainer">
+            <ul class="entityList" >
+              <!-- <li><span class="entityListLeftContainer"><span>亚特兰大级巡洋舰</span><span class="entityListLabel">已经保存属性</span><span class="entityListLabel">已经保存关系</span><span style="color:#D9001B;">别名</span></span><span class="entityListRightContainer"><span style="color: #02A7F0;">实例属性</span><span style="color: #00bfbf;">实例关系</span><img src="../../assets/images/u1782.svg" alt=""></span></li> -->
+              <!-- <li>CL51亚特兰大号巡洋舰<span class="entityListRightContainer"><span>实例属性</span><span style="color: #00bfbf;">实例关系</span><img src="../../assets/images/u1782.svg" alt=""></span></li> -->
+
+              <li v-for="item in extractData" :key="item.id">
+                <span class="entityListLeftContainer">
+                  <span>{{ item.entityName }}</span>
+                  <span class="entityListLabel" v-if="item.isProperty">已经保存属性</span>
+                  <span class="entityListLabel" v-if="item.isRelation">已经保存关系</span>
+                  <span style="color:#D9001B;">{{ item.alias }}</span>
+                </span>
+                <span class="entityListRightContainer">
+                  <span style="color: #02A7F0;">实例属性</span>
+                  <span style="color: #00bfbf;">实例关系</span>
+                  <img src="../../assets/images/u1782.svg" alt="" @click="dropEntity(item)">
+                </span>
+              </li>
+            </ul>
+          </div>
+          <div class="entityDetailFooter" v-if="extractData && extractData.length > 0">
+            <el-button type="primary" style="background-color: #03afb0;margin-right: 30px;"  @click="submitReview()" >提交审核</el-button>
+            <el-button type="primary"  @click="back()" >返回</el-button>
+          </div>
         </div>
     </div>
 </template>
 
 <script>
-import { annotationFistPage } from "@/api/datalabel/label";
+import { annotationFistPage,getEntityList } from "@/api/datalabel/label";
 export default {
   props:['params'],
   name: "newsDetail",
   created(){
-    console.log(this.params)
-    annotationFistPage(this.params).then(res=>{
+    let annotationFistPageParams = {
+      docId:this.params.articleId,
+      docPhase:this.params.docPhase,
+      docType:this.params.docType
+    }
+    annotationFistPage(annotationFistPageParams).then(res=>{
       this.passageDetail = res.data
+      this.highlightText()
     })
+    this.getEntityListFunction()
   },
   data() {
     return {
+        extractData:[],
+        fullscreenLoading: false,
         form:{},
-        passageDetail:{
-          content:'词向量'
-        },
+        passageDetail:{},
         dialogFormVisible:false,
         selfdefine:false,
         addEntityForm:{
@@ -82,6 +124,10 @@ export default {
           entityName:'',
           text:''
         },
+        searchQuery: '',   
+        highlightedContent: '',  
+        regularText:'规范1',
+        innerVisible:false,
         labelPosition:'right',
         rules: {
           entityType: [
@@ -97,8 +143,39 @@ export default {
     };
   },
   methods: {
+    extractText(){
+      this.fullscreenLoading = true;
+      setTimeout(() => {
+        this.fullscreenLoading = false;
+        this.extractData = this.entityListData
+      }, 2000);
+    },
+    dropEntity(item){
+      this.$confirm('是否删除该实例?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          console.log(item.id)
+          this.$message({
+            type: 'success',
+            message: '删除成功!',
+          });
+          
+        });
+    },
     back(){
       this.$router.back()
+    },
+    getEntityListFunction(){
+      let getEntityListParams = {
+        docId:this.params.articleId,
+        docStatus:this.params.docStatus,
+        docType:this.params.docType
+      }
+      getEntityList(getEntityListParams).then(res => {
+        this.extractData = res.data
+      })
     },
     addEntity(){
       this.dialogFormVisible = true
@@ -113,6 +190,29 @@ export default {
             type: 'success',
             message: '删除成功!'
           });
+        });
+    },
+    startSelecting() {
+      document.addEventListener('mouseup', this.handleTextSelection);
+    },
+    handleTextSelection() {
+      const selectedText = window.getSelection().toString();
+      if (selectedText) {
+        this.addEntityForm.text += selectedText + ' ';
+      }
+          // 停止监听鼠标抬起事件
+      document.removeEventListener('mouseup', this.handleTextSelection);
+    },
+    submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.$message.success('添加成功!');
+            this.resetForm(formName)
+            this.dialogFormVisible = false;
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
         });
     },
     getStatusClass(status) {
@@ -146,18 +246,71 @@ export default {
           return '';
       }
     },
+    highlightText() {  
+      if (!this.searchQuery) {  
+        // 如果没有搜索内容，则显示原始文本  
+        this.highlightedContent = this.passageDetail.content;
+        return;  
+      }  
+      // 使用正则表达式替换匹配的文本  
+      const regex = new RegExp(this.searchQuery, 'gi');  
+      this.highlightedContent = this.passageDetail.content.replace(regex, '<span class="highlight">$&</span>');  
+    },  
     changeSelfDefine(){
       this.addEntityForm.entityType = '';
       this.selfdefine = !this.selfdefine
     },
     getNameRegualation(){
-
+      if(this.addEntityForm.entityType==''){
+        this.$message.error('请先选择实例类型！')
+         return false
+      }
+      this.innerVisible =true
     }
-  }
+  },
+  computed: {
+    
+  },
 };
 </script>
 
 <style lang="scss" scoped>
+.entityListContainer{
+  margin-top: 20px;
+}
+.entityList{
+  color: #CECECE;
+  list-style-type: none;
+  padding-left: 0;
+  font-size: 12px;
+  li{
+    border-bottom: 1px solid #cecece;
+    padding-bottom: 5px;
+    margin-bottom: 30px;
+    .entityListRightContainer{
+      float:right;
+      display: flex;
+      align-items: center; 
+      span{
+        margin-right: 10px;
+        cursor: pointer;
+      }
+      img {
+        cursor: pointer;
+      }
+    }
+  }
+}
+.entityListLeftContainer span{
+  margin-right: 10px;
+}
+.entityListLabel{
+  color:#D9001B;
+  border: 1px solid #D9001B;;
+  border-radius: 15px;
+  padding: 2px 5px;
+}
+
 .newListDetailContainer{
   display: flex;
   padding: 30px;
@@ -180,7 +333,7 @@ export default {
 .addEntity{
   color: #02a7f0;
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 .newsTitle{
   border-bottom: 1px dashed #6498bb;
@@ -192,12 +345,14 @@ export default {
   width: 100%;
 }
 .newsTitleContent1{
-  height: 30px;
-  line-height: 30px;
-  .el-button--mini{
-    padding: 5px 10px;
-    font-size: 10px;
-    margin-top: 4px;
+  .newsTitleContentright{
+    display: flex;
+    align-items: center;
+    float: right;
+    .el-button--mini{
+      padding: 5px 10px;
+      font-size: 10px;
+    }
   }
 }
 .passageTitle{
@@ -207,7 +362,7 @@ export default {
 .newsContent{
   color: #CECECE;
   padding: 10px 0;
-  height: 70vh;
+  height:71vh;
   overflow-y: scroll;
   font-size: 12px;
 }
@@ -222,5 +377,19 @@ export default {
 }
 ::v-deep .el-dialog {
   pointer-events: all; /* 确保el-dialog内部可以交互 */
+  top: 15%;
+}
+::v-deep .highlight {  
+  background-color: yellow;  
+  color: black;
+}
+::v-deep .highlight {  
+  background-color: yellow;  
+}
+::v-deep  .el-input__inner {
+  height: 30px;
+}
+.entityDetailFooter{
+  text-align: center;
 }
 </style>

@@ -247,11 +247,7 @@ export default {
       }
     },
     goToNewsDetail(item){
-        let params ={
-            docId:item.articleId,
-            docPhase:item.docPhase,
-            docType:item.docType
-        }
+        let params = item
         this.$router.push({name:'newsDetail',params:{params}});
         // Cookies.set('newListParams',JSON.stringify(this.queryParams))
     },

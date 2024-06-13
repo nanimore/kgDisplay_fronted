@@ -29,3 +29,10 @@ import request from '@/utils/request'
       data: query
     })
   }
+  export function getEntityList(query) {
+    return request({
+      url: '/proofread/getEntityList',
+      method: 'post',
+      data: query
+    })
+  }
