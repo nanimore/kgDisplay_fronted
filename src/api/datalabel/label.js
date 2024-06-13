@@ -15,6 +15,7 @@ import request from '@/utils/request'
       params: query
     })
   }
+  
   export function getInitDocCategory(query) {
     return request({
       url: 'articleFilter/initDocCategory',
@@ -32,6 +33,13 @@ import request from '@/utils/request'
   export function getEntityList(query) {
     return request({
       url: '/proofread/getEntityList',
+      method: 'post',
+      data: query
+    })
+  }
+  export function discard(query) {
+    return request({
+      url: '/proofread/discard',
       method: 'post',
       data: query
     })

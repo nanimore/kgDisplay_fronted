@@ -77,11 +77,11 @@
                   <span class="entityListLabel" v-if="item.isSaveProp">已经保存属性</span>
                   <span class="entityListLabel" v-if="item.isSaveRel">已经保存关系</span>
                   <span style="color: #95F204;" v-if="item.isCustomNorm">新规范</span>
-                  <span style="color:#D9001B;" v-for="data in item.extractOrigin">{{ data }}</span>
+                  <span style="color:#D9001B;" v-for="data in item.extractOrigin" @click="aliasFindHighLight()">{{ data }}</span>
                 </span>
                 <span class="entityListRightContainer" v-if="item.isCustomOntoType">
                   <span style="color: #F59A23;">[ 自定义类型 ]</span>
-                  <span style="color: white;border-radius: 15px;padding: 3px 6px;background-color:#bfbf00;">{{ item.entityType }}</span>
+                  <span style="color: white;border-radius: 15px;padding:0 6px;background-color:#bfbf00;">{{ item.entityType }}</span>
                   <img src="../../assets/images/u1782.svg" alt="" @click="dropEntity(item)">
                 </span>
                 <span class="entityListRightContainer" v-else>
@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import { annotationFistPage,getEntityList } from "@/api/datalabel/label";
+import { annotationFistPage,getEntityList,discard } from "@/api/datalabel/label";
 export default {
   props:['params'],
   name: "newsDetail",
@@ -187,15 +187,26 @@ export default {
       this.dialogFormVisible = true
     },
     dropOutPassage(){
+      let params = {
+        docId:this.params.articleId,
+        docStatus:this.params.docStatus,
+        docType:this.params.docType
+      }
+
       this.$confirm('是否丢弃该文章?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          });
+          discard(params).then(res=>{
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+            setTimeout(() => {
+              this.$router.back()
+            }, 1000);
+          })
         });
     },
     startSelecting() {
@@ -272,6 +283,10 @@ export default {
          return false
       }
       this.innerVisible =true
+    },
+    aliasFindHighLight(data){
+      this.searchQuery = data
+      this.highlightText()
     }
   },
   computed: {
