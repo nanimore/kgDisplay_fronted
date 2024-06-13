@@ -76,9 +76,15 @@
                   <span>{{ item.entityName }}</span>
                   <span class="entityListLabel" v-if="item.isProperty">已经保存属性</span>
                   <span class="entityListLabel" v-if="item.isRelation">已经保存关系</span>
+                  <span style="color: #95F204;" v-if="item.isNew">新规范</span>
                   <span style="color:#D9001B;">{{ item.alias }}</span>
                 </span>
-                <span class="entityListRightContainer">
+                <span class="entityListRightContainer" v-if="item.isSelfDefined">
+                  <span style="color: #02A7F0;">[ 自定义类型 ]</span>
+                  <span style="color: #00bfbf;">{{ item.entityType }}</span>
+                  <img src="../../assets/images/u1782.svg" alt="" @click="dropEntity(item)">
+                </span>
+                <span class="entityListRightContainer" v-else>
                   <span style="color: #02A7F0;">实例属性</span>
                   <span style="color: #00bfbf;">实例关系</span>
                   <img src="../../assets/images/u1782.svg" alt="" @click="dropEntity(item)">

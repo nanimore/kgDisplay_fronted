@@ -255,7 +255,7 @@ export default {
         this.resetForm("queryParams")
         this.handleQuery()
     },
-    handleQuery(){
+    handleQuery(pageSize,currentpage){
         let disstartDate ='';
         let disendDate = '';
         let pubstartDate = '';
@@ -274,6 +274,14 @@ export default {
             createstartDate = this.formatDate(this.queryParams.createTime[0]);
             createendtDate = this.formatDate(this.queryParams.createTime[1]);
         }
+        let pagesizeTemp =this.pageSize
+        let currentPageTemp = this.currentPage
+        if(pageSize){
+            pagesizeTemp = pageSize 
+        }
+        if(currentpage){
+            currentPageTemp = currentpage
+        }
         const params = {
           docType: this.queryParams.docType,
           dataType: this.queryParams.dataType,
@@ -286,8 +294,8 @@ export default {
           publishTimeStart:pubstartDate,
           publishTimeEnd:pubendDate,
           pageStatus:0,
-          page:this.currentPage,
-          size:this.pageSize
+          page:currentPageTemp,
+          size:pagesizeTemp
         };
         labelNewsList(params).then(res => {
             this.newDataList = res.data.docResList
@@ -295,22 +303,24 @@ export default {
         });
     },
     handleSizeChange(pageSize){
-        this.pageSize = pageSize
-        this.handleQuery()
+        this.handleQuery(pageSize,this.currentPage)
     },
     handleCurrentChange(currentpage){
-        this.currentPage = currentpage
-        this.handleQuery()
+        this.handleQuery(this.pageSize,currentpage)
     },
     onselectChange(){
         const specialFieldValue = this.queryParams.docStatus;
         this.$refs['queryParams'].resetFields();
+        this.currentPage = 1
+        this.pageSize = 10
         this.queryParams.docStatus = specialFieldValue
         this.handleQuery()
     },
     resetForm(formName) {
         const specialFieldValue = this.queryParams.docStatus;
         this.$refs[formName].resetFields();
+        this.currentPage = 1
+        this.pageSize = 10
         this.queryParams.docStatus = specialFieldValue
         this.handleQuery()
     },
