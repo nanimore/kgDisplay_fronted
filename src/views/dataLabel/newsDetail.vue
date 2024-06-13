@@ -74,19 +74,19 @@
               <li v-for="item in extractData" :key="item.id">
                 <span class="entityListLeftContainer">
                   <span>{{ item.entityName }}</span>
-                  <span class="entityListLabel" v-if="item.isProperty">已经保存属性</span>
-                  <span class="entityListLabel" v-if="item.isRelation">已经保存关系</span>
-                  <span style="color: #95F204;" v-if="item.isNew">新规范</span>
-                  <span style="color:#D9001B;">{{ item.alias }}</span>
+                  <span class="entityListLabel" v-if="item.isSaveProp">已经保存属性</span>
+                  <span class="entityListLabel" v-if="item.isSaveRel">已经保存关系</span>
+                  <span style="color: #95F204;" v-if="item.isCustomNorm">新规范</span>
+                  <span style="color:#D9001B;" v-for="data in item.extractOrigin">{{ data }}</span>
                 </span>
-                <span class="entityListRightContainer" v-if="item.isSelfDefined">
-                  <span style="color: #02A7F0;">[ 自定义类型 ]</span>
-                  <span style="color: #00bfbf;">{{ item.entityType }}</span>
+                <span class="entityListRightContainer" v-if="item.isCustomOntoType">
+                  <span style="color: #F59A23;">[ 自定义类型 ]</span>
+                  <span style="color: white;border-radius: 15px;padding: 3px 6px;background-color:#bfbf00;">{{ item.entityType }}</span>
                   <img src="../../assets/images/u1782.svg" alt="" @click="dropEntity(item)">
                 </span>
                 <span class="entityListRightContainer" v-else>
-                  <span style="color: #02A7F0;">实例属性</span>
-                  <span style="color: #00bfbf;">实例关系</span>
+                  <span style="color: #02A7F0;" :class="{ 'text-with-star': item.propontoModify }">实例属性</span>
+                  <span style="color: #00bfbf;" :class="{ 'text-with-star': item.relontoModify }">实例关系</span>
                   <img src="../../assets/images/u1782.svg" alt="" @click="dropEntity(item)">
                 </span>
               </li>
@@ -397,5 +397,18 @@ export default {
 }
 .entityDetailFooter{
   text-align: center;
+}
+.text-with-star {
+    position: relative;
+    display: inline-block;
+}
+
+.text-with-star::after {
+    content: '★'; /* 星星符号 */
+    color: red; /* 红色 */
+    font-size: 7px; /* 调整星星的大小 */
+    position: absolute;
+    top: -5px; /* 调整星星的位置 */
+    right: -5px; /* 调整星星的位置 */
 }
 </style>
