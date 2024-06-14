@@ -9,8 +9,7 @@ const user = {
     avatar: '',
     roles: [],
     permissions: [],
-    isAdmin: true,
-    searchCriteria:{}
+    isAdmin: true
   },
 
   mutations: {
@@ -34,9 +33,6 @@ const user = {
     },
     SET_ADMIN: (state, isAdmin) => {
       state.isAdmin = isAdmin
-    },
-    setSearchCriteria(state, criteria) {
-      state.searchCriteria = criteria;
     }
   },
 
@@ -55,9 +51,7 @@ const user = {
         })
       })
     },
-    updateSearchCriteria({ commit }, criteria) {
-      commit('setSearchCriteria', criteria);
-    },
+
     // 获取用户信息
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {

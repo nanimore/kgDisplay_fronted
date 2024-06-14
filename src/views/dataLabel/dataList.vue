@@ -173,13 +173,14 @@ export default {
     //     let keyword = Cookies.get("newListParams")
     //     this.queryParams = JSON.parse(keyword)
     // }
+  },
+  mounted(){
     const savedSearchCriteria = sessionStorage.getItem('searchCriteria');
     if (sessionStorage.getItem('fromDetail') && savedSearchCriteria) {
       this.queryParams = JSON.parse(savedSearchCriteria);
       sessionStorage.removeItem('fromDetail'); // 重置状态
     }
     this.handleQuery()
-    
   },
   data() {
     return {
