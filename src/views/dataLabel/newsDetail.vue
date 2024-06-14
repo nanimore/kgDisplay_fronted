@@ -171,6 +171,7 @@ export default {
         });
     },
     back(){
+      sessionStorage.setItem('fromDetail', true);
       this.$router.back()
     },
     getEntityListFunction(){
@@ -204,7 +205,7 @@ export default {
               message: '删除成功!'
             });
             setTimeout(() => {
-              this.$router.back()
+              this.back()
             }, 1000);
           })
         });

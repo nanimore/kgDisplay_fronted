@@ -173,6 +173,11 @@ export default {
     //     let keyword = Cookies.get("newListParams")
     //     this.queryParams = JSON.parse(keyword)
     // }
+    const savedSearchCriteria = sessionStorage.getItem('searchCriteria');
+    if (sessionStorage.getItem('fromDetail') && savedSearchCriteria) {
+      this.queryParams = JSON.parse(savedSearchCriteria);
+      sessionStorage.removeItem('fromDetail'); // 重置状态
+    }
     this.handleQuery()
     
   },
@@ -301,6 +306,7 @@ export default {
             this.newDataList = res.data.docResList
             this.totalNum = res.data.totalCount
         });
+        sessionStorage.setItem('searchCriteria', JSON.stringify(this.queryParams));
     },
     handleSizeChange(pageSize){
         this.handleQuery(pageSize,this.currentPage)

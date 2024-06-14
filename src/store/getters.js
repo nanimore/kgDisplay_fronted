@@ -15,6 +15,7 @@ const getters = {
   topbarRouters:state => state.permission.topbarRouters,
   defaultRoutes:state => state.permission.defaultRoutes,
   sidebarRouters:state => state.permission.sidebarRouters,
-  isAdmin:state => state.user.isAdmin
+  isAdmin:state => state.user.isAdmin,
+  getSearchCriteria: state => state.searchCriteria
 }
 export default getters
