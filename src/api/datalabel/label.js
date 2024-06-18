@@ -44,3 +44,18 @@ import request from '@/utils/request'
       data: query
     })
   }
+  export function getEntityNameByEntityType(query) {
+    return request({
+      url: '/proofread/getEntityName',
+      method: 'post',
+      params: query
+    })
+  }
+  export function deleteEntity(query) {
+    return request({
+      url: '/proofread/deleteEntity',
+      method: 'post',
+      data: query
+    })
+  }
+  
