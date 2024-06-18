@@ -120,7 +120,7 @@
             <el-tab-pane label="实例属性">
               <div class="addSelfProp" @click="addSelfProp()" ><img src="../../assets/images/u1895.svg" style="width: 15px;height: 15px;margin-right: 8px;"></img><span style="cursor: pointer;">自定义属性</span></div>
               <div v-if="formVisible">
-                <el-form :model="selfDefinePropForm" class="selfDefinePropForm">
+                <el-form :model="selfDefinePropForm" class="selfDefinePropForm" label-width="60px">
                   <el-form-item :label="item.label" v-for="item in selfDefinePropForm.items" :key="item.label">
                     <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getSelectedText(item.id)">
                     <el-input v-model="item.value" style="margin-right: 20px;"></el-input>
@@ -131,12 +131,52 @@
                       <span class="selfDefinePropFormSpan" @click="removeForm()">清除</span>
                     </span>
                   </el-form-item>
-
                 </el-form>
               </div>
+              <el-form :model="propForm" ref="propForm" label-width="100px">  
+                <el-form-item  
+                  v-for="(item, index) in formItems"  
+                  :key="index"  
+                  :label="item.name"  
+                  :prop="item.engName"  
+                >  
+                  <el-input v-model="form[item.engName]" style="width: 250px;"></el-input>  
+                  <!-- 这里可以根据需要添加其他类型的表单组件，如密码框、邮箱框等 -->  
+                </el-form-item>  
+                <el-form-item>  
+                  <el-button type="primary" @click="submitForm('propForm')">保存全部属性</el-button>  
+                </el-form-item>  
+              </el-form> 
             </el-tab-pane>
             <el-tab-pane label="实例关系">
-              2
+              <el-form :model="relform" ref="relform" label-width="120px">  
+                <el-form-item  
+                  v-for="(item, index) in RelformItems"  
+                  :key="index"  
+                  :label="item.label"  
+                  :prop="item.prop"  
+                >  
+                  <el-input  
+                    v-if="!item.isEditing"  
+                    v-model="relform[item.prop]"  
+                    @focus="startEditing(index)"  
+                    placeholder="点击编辑"  
+                  ></el-input>  
+                  <span v-else>{{ relform[item.prop] }}</span>  
+                  <el-button  
+                    type="text"  
+                    icon="el-icon-edit"  
+                    @click="startEditing(index)"  
+                    v-if="!item.isEditing"  
+                  >编辑</el-button>  
+                  <el-button  
+                    type="text"  
+                    icon="el-icon-check"  
+                    @click="saveAndHide(index)"  
+                    v-if="item.isEditing"  
+                  >保存</el-button>  
+                </el-form-item>  
+              </el-form>  
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -145,7 +185,7 @@
 </template>
 
 <script>
-import { annotationFistPage,getEntityList,discard,getEntityNameByEntityType,deleteEntity } from "@/api/datalabel/label";
+import { annotationFistPage,getEntityList,discard,getEntityNameByEntityType,deleteEntity,getPropList } from "@/api/datalabel/label";
 import { getAllEntityType } from "@/api/index";
 export default {
   props:['params'],
@@ -168,6 +208,8 @@ export default {
         extractData:[],
         fullscreenLoading: false,
         form:{},
+        formItems:[],
+        propForm:{},
         isDetail:true,
         passageDetail:{},
         dialogFormVisible:false,
@@ -177,6 +219,12 @@ export default {
           entityName:'',
           text:''
         },
+        relform: {}, // 用于存储表单数据的对象  
+        RelformItems: [ // 假设这是从接口获取的表单结构  
+          { label: '用户名', prop: 'username', isEditing: false },  
+          { label: '密码', prop: 'password', isEditing: false },  
+          // ... 其他字段  
+        ],  
         entityNameList:[],
         entityTypeList:[],
         formVisible:false,
@@ -223,16 +271,19 @@ export default {
     },
     removeForm() {
       this.formVisible = false;
-      this.selfDefinePropForm = {
-        field1: '',
-        field2: ''
-      };
     },
     getAllEntityType(){
       getAllEntityType().then(res=>{
         this.entityTypeList = res.data
       })
     },
+    startEditing(index) {  
+      this.RelformItems[index].isEditing = true;  
+    },  
+    saveAndHide(index) {  
+      this.RelformItems[index].isEditing = false;  
+ 
+    },  
     dropEntity(item){
       let deleteEntityParams = {
         docId:this.params.articleId,
@@ -316,6 +367,18 @@ export default {
       this.nowlabelEntityName = item.entityName
       this.nowlabelEntityType = item.entityType
       this.getEntityNameByEntityTypeFunction()
+      this.getPropListFunction(item.uuid)
+    },
+    getPropListFunction(id){
+      let params = {
+        docId:this.params.articleId,
+        docStatus:this.params.docStatus,
+        docType:this.params.docType,
+        uuid:id
+      }
+      getPropList(params).then(res=>{
+        this.formItems = res.data
+      })
     },
     submitForm(formName) {
         this.$refs[formName].validate((valid) => {
@@ -390,7 +453,7 @@ export default {
       this.selfdefine = !this.selfdefine
     },
     getNameRegualation(){
-      if(this.addEntityForm.entityType==''){
+      if(this.addEntityForm.entityType==''&&this.nowlabelEntityType==''){
         this.$message.error('请先选择实例类型！')
          return false
       }
@@ -599,5 +662,9 @@ export default {
     margin-right: 15px;
     cursor: pointer;
   }
+}
+::v-deep .el-tabs__content{
+  height: 70vh;
+  overflow-y: scroll;
 }
 </style>

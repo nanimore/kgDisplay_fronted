@@ -58,4 +58,11 @@ import request from '@/utils/request'
       data: query
     })
   }
+  export function getPropList(query) {
+    return request({
+      url: '/proofread/getPropertyList',
+      method: 'post',
+      data: query
+    })
+  }
   

@@ -414,9 +414,6 @@ export default {
         color: white;
         padding: 0 30px;
     }
-    ::v-deep .el-dialog__body .el-form-item__label{
-        color: black;
-    }
 </style>
   
   
