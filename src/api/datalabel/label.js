@@ -39,7 +39,7 @@ import request from '@/utils/request'
   }
   export function discard(query) {
     return request({
-      url: '/proofread/discard',
+      url: '/article/discard',
       method: 'post',
       data: query
     })
