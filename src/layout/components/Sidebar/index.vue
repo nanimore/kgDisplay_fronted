@@ -45,49 +45,49 @@
                     </template>
                     <el-submenu index="3-1">
                         <template slot="title">媒体数据</template>
-                        <el-menu-item index="3-1-1">全部</el-menu-item>
-                        <el-menu-item index="3-1-2">舰船</el-menu-item>
-                        <el-menu-item index="3-1-3">飞行器</el-menu-item>
-                        <el-menu-item index="3-1-4">雷达</el-menu-item>
+                        <el-menu-item index="3-1-1" @click="navigateTo()">全部</el-menu-item>
+                        <el-menu-item index="3-1-2" @click="navigateTo()">舰船</el-menu-item>
+                        <el-menu-item index="3-1-3" @click="navigateTo()">飞行器</el-menu-item>
+                        <el-menu-item index="3-1-4" @click="navigateTo()">雷达</el-menu-item>
                         <el-submenu index="3-1-5">
                             <template slot="title">固定目标</template>
-                            <el-menu-item index="3-1-5-1">基地</el-menu-item>
-                            <el-menu-item index="3-1-5-2">电厂</el-menu-item>
-                            <el-menu-item index="3-1-5-3">机场</el-menu-item>
+                            <el-menu-item index="3-1-5-1" @click="navigateTo()">基地</el-menu-item>
+                            <el-menu-item index="3-1-5-2" @click="navigateTo()">电厂</el-menu-item>
+                            <el-menu-item index="3-1-5-3" @click="navigateTo()">机场</el-menu-item>
                         </el-submenu>
                     </el-submenu>
-                    <el-menu-item index="3-2">相似数据</el-menu-item>
+                    <el-menu-item index="3-2" @click="navigateTo()">相似数据</el-menu-item>
                     <el-submenu index="3-3">
                         <template slot="title">无类别数据</template>
-                        <el-menu-item index="3-3-1">噪音数据</el-menu-item>
-                        <el-menu-item index="3-3-2">我方数据</el-menu-item>
-                        <el-menu-item index="3-3-3">其它数据</el-menu-item>
+                        <el-menu-item index="3-3-1" @click="navigateTo()">噪音数据</el-menu-item>
+                        <el-menu-item index="3-3-2" @click="navigateTo()">我方数据</el-menu-item>
+                        <el-menu-item index="3-3-3" @click="navigateTo()">其它数据</el-menu-item>
                     </el-submenu>
-                    <el-menu-item index="3-4">丢弃数据</el-menu-item>
+                    <el-menu-item index="3-4" @click="navigateTo()">丢弃数据</el-menu-item>
                     <el-submenu index="3-5">
                         <template slot="title">百科数据</template>
-                        <el-menu-item index="3-5-1">全部</el-menu-item>
-                        <el-menu-item index="3-5-2">舰船</el-menu-item>
-                        <el-menu-item index="3-5-3">飞行器</el-menu-item>
-                        <el-menu-item index="3-5-4">雷达</el-menu-item>
+                        <el-menu-item index="3-5-1" @click="navigateTo()">全部</el-menu-item>
+                        <el-menu-item index="3-5-2" @click="navigateTo()">舰船</el-menu-item>
+                        <el-menu-item index="3-5-3" @click="navigateTo()">飞行器</el-menu-item>
+                        <el-menu-item index="3-5-4" @click="navigateTo()">雷达</el-menu-item>
                         <el-submenu index="3-5-5">
                             <template slot="title">固定目标</template>
-                            <el-menu-item index="3-5-5-1">基地</el-menu-item>
-                            <el-menu-item index="3-5-5-2">电厂</el-menu-item>
-                            <el-menu-item index="3-5-5-3">机场</el-menu-item>
+                            <el-menu-item index="3-5-5-1" @click="navigateTo()">基地</el-menu-item>
+                            <el-menu-item index="3-5-5-2" @click="navigateTo()">电厂</el-menu-item>
+                            <el-menu-item index="3-5-5-3" @click="navigateTo()">机场</el-menu-item>
                         </el-submenu>
                     </el-submenu>
                     <el-submenu index="3-6">
                         <template slot="title">文档数据</template>
-                        <el-menu-item index="3-6-1">全部</el-menu-item>
-                        <el-menu-item index="3-6-2">舰船</el-menu-item>
-                        <el-menu-item index="3-6-3">飞行器</el-menu-item>
-                        <el-menu-item index="3-6-4">雷达</el-menu-item>
+                        <el-menu-item index="3-6-1" @click="navigateTo()">全部</el-menu-item>
+                        <el-menu-item index="3-6-2" @click="navigateTo()">舰船</el-menu-item>
+                        <el-menu-item index="3-6-3" @click="navigateTo()">飞行器</el-menu-item>
+                        <el-menu-item index="3-6-4" @click="navigateTo()">雷达</el-menu-item>
                         <el-submenu index="3-6-5">
                             <template slot="title">固定目标</template>
-                            <el-menu-item index="3-6-5-1">基地</el-menu-item>
-                            <el-menu-item index="3-6-5-2">电厂</el-menu-item>
-                            <el-menu-item index="3-6-5-3">机场</el-menu-item>
+                            <el-menu-item index="3-6-5-1" @click="navigateTo()">基地</el-menu-item>
+                            <el-menu-item index="3-6-5-2" @click="navigateTo()">电厂</el-menu-item>
+                            <el-menu-item index="3-6-5-3" @click="navigateTo()">机场</el-menu-item>
                         </el-submenu>
                     </el-submenu>
                 </el-submenu>
@@ -255,6 +255,36 @@ export default {
             ],
             userRole: 'user', // 示例角色，实际应用中应从后端或Vuex中获取，
         }
+    },
+    methods: {
+        navigateTo() {
+      // 获取被点击的菜单项
+      const menuItem = event.target;
+      // 获取菜单项的标题
+      const itemTitle = menuItem.innerText.trim();
+      // 获取父级菜单的标题
+      let parentTitle = '';
+      let parentElement1 = menuItem.closest('.el-submenu');
+      if (parentElement1) {
+        const titleElement = parentElement1.querySelector('.el-submenu__title');
+        if (titleElement) {
+          parentTitle = titleElement.innerText.trim();
+          if(parentTitle==='固定目标'){
+            let parentElement2 =parentElement1.parentElement.parentElement;
+            console.log(parentElement2)
+            let titleElement2 = parentElement2.querySelector('.el-submenu__title');
+            console.log(titleElement2)
+            parentTitle = titleElement2.innerText.trim();
+          }
+        }
+      }
+      let params = {
+        parentTitles:parentTitle,
+        itemTitles:itemTitle
+      }
+      // 导航到指定路径
+      this.$router.push({name:'Index1',params:{params}});
+    }
     },
     components: { SidebarItem, Logo },
     computed: {

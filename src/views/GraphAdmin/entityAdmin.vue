@@ -48,6 +48,7 @@
             <div class="leftContainer">
                 <div class="entityType">实例类型</div>
                 <el-input
+                    prefix-icon="el-icon-search"
                     placeholder="输入实例名称搜索"
                     v-model="filterText">
                 </el-input>
@@ -336,6 +337,22 @@ export default {
     ::v-deep .el-descriptions-item__label{
         width: 30%;
         text-align: center;
+    }
+    .el-tree{
+        background-color: rgba(0,0,0,1);
+        color: white;
+    }
+    ::v-deep .leftContainer .el-input__inner{
+        background-color: rgba(0,0,0,1) !important;
+        color: white;
+    }
+    ::v-deep .el-checkbox__inner{
+        background-color: rgba(1,84,120,1);
+        border: 1px solid rgba(2,125,180,1);
+    }
+    ::v-deep .el-tree-node__content{
+        background: url('../../assets/images/u376.svg') no-repeat;
+        
     }
 </style>
   

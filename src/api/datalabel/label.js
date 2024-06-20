@@ -65,4 +65,34 @@ import request from '@/utils/request'
       data: query
     })
   }
-  
+  export function getInitDatasourceName(query) {
+    console.log(query)
+    return request({
+      url: 'articleFilter/initDatasourceName',
+      method: 'get',
+      params: query
+    })
+  }
+  export function getInitProofreaders(query) {
+    console.log(query)
+    return request({
+      url: '/articleFilter/initProofreaders',
+      method: 'get',
+      params: query
+    })
+  }
+  export function assignArticle(query) {
+    console.log(query)
+    return request({
+      url: '/article/assignArticle',
+      method: 'post',
+      data: query,
+    })
+  }
+  export function cancelAssignArticle(query) {
+    return request({
+      url: '/article/cancelAssignArticle',
+      method: 'post',
+      data: query,
+    })
+  }

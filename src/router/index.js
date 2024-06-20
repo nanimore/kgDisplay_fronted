@@ -47,6 +47,19 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    path: '/datadistribution',
+    component: Layout,
+    redirect: 'index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/datadistribution/index'),
+        name: 'Index1',
+        props: true
+      }
+    ]
+  },
+  {
     path: '/register',
     component: () => import('@/views/register'),
     hidden: true
@@ -132,6 +145,7 @@ export const constantRoutes = [
         meta: { title: '新闻详情'},
         props: true
       },
+      
     ]
   },
   {
