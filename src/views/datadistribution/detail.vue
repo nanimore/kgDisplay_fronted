@@ -165,6 +165,7 @@ export default {
         updateDataType(params).then(res=>{
             if(res.code==200){
                 this.$message.success('修改实例类型成功！')
+                this.params.dataType = this.dataType
             }
         })
     },

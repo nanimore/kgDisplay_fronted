@@ -111,7 +111,8 @@
                     <span v-if="item.assignTime && queryParams.docStatus==1">分配时间：{{item.assignTime}}</span>
                     <span v-if="item.publishTime">发布时间：{{item.publishTime}}</span>
                     <span v-if="item.proofreader && queryParams.docStatus==1">标注人：{{item.proofreader}}</span>
-                    <span v-if="item.proofreader && pageStatus==4">丢弃人：{{item.proofreader}}</span>
+                    <span v-if="item.proofreader && pageStatus==4" style="color: red;">丢弃人：{{item.proofreader}}</span>
+                    <img src="../../assets/images/u1782.svg" alt="" @click="deleteArticle(item)" style="width:15px;height: 15px;cursor: pointer;margin-left: 20px;">
                 </div>
             </div>
             <div class="block" style="margin-top: 30px;">
@@ -130,7 +131,7 @@
 </template>
   
 <script>
-import { labelNewsList,getinitDocType,getInitDocCategory,getInitDatasourceName,getInitProofreaders,assignArticle,cancelAssignArticle } from "@/api/datalabel/label";
+import { labelNewsList,getinitDocType,getInitDocCategory,getInitDatasourceName,getInitProofreaders,assignArticle,cancelAssignArticle,deleteArticle } from "@/api/datalabel/label";
 export default {
   props:['params'],
   name: "dataLabel",
@@ -335,6 +336,31 @@ export default {
       const seconds = String(d.getSeconds()).padStart(2, '0');  // 获取秒，并补零
       return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     },
+    deleteArticle(item){
+        let deleteParams = {
+        docId:item.articleId,
+        docStatus:item.docStatus,
+        docType:item.docType,
+        uuid:item.articleId
+      }
+      this.$confirm('是否删除该新闻?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+            deleteArticle(deleteParams).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '删除成功!',
+              });
+              setTimeout(() => {
+              this.handleQuery()
+            }, 1000);
+            }
+          })
+        });
+    },
     handleAssign() {
         if(this.queryParams.proofreader){
             if(this.selectedNews.length == 0){
@@ -429,6 +455,7 @@ export default {
             margin-right: 20px;
         }
         margin-bottom: 10px;
+        display: flex;
     }
     .typeclass{
         padding: 3px 10px;
