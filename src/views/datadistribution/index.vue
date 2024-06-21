@@ -170,7 +170,11 @@ export default {
             this.initDocNameList = res.data
         })
     }
-    
+    const savedSearchCriteria = sessionStorage.getItem('searchCriteria');
+    if (sessionStorage.getItem('fromDetail') && savedSearchCriteria) {
+      this.queryParams = JSON.parse(savedSearchCriteria);
+      sessionStorage.removeItem('fromDetail'); // 重置状态
+    }
     this.handleQuery()
   },
   data() {
@@ -238,7 +242,7 @@ export default {
     },
     goToNewsDetail(item){
         let params = item
-        this.$router.push({name:'newsDetail',params:{params}});
+        this.$router.push({name:'detail',params:{params}});
         // Cookies.set('newListParams',JSON.stringify(this.queryParams))
     },
     resetQuery(){

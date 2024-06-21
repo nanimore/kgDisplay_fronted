@@ -96,3 +96,17 @@ import request from '@/utils/request'
       data: query,
     })
   }
+  export function deleteArticle(query) {
+    return request({
+      url: '/article/delete',
+      method: 'post',
+      data: query,
+    })
+  }
+  export function updateDataType(query) {
+    return request({
+      url: '/article/updateDataType',
+      method: 'post',
+      data: query,
+    })
+  }

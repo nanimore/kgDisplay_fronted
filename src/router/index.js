@@ -56,6 +56,12 @@ export const constantRoutes = [
         component: () => import('@/views/datadistribution/index'),
         name: 'Index1',
         props: true
+      },
+      {
+        path: 'detail',
+        component: () => import('@/views/datadistribution/detail'),
+        name: 'detail',
+        props: true
       }
     ]
   },
