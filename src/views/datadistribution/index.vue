@@ -157,12 +157,20 @@ export default {
         this.isDropData = false
         this.pageStatus = 4
         }else{
-            this.queryParams.docType = this.params.parentTitles
-            if(this.params.itemTitles == '全部'){
-                this.queryParams.dataType = ''
+            if(this.params.itemTitles=='相似数据'){
+                if(this.params.itemTitles == '全部'){
+                    this.queryParams.dataType = ''
+                }else{
+                    this.queryParams.dataType = this.params.itemTitles
+                }
             }else{
-                this.queryParams.dataType = this.params.itemTitles
-            }
+                this.queryParams.docType = this.params.parentTitles
+                if(this.params.itemTitles == '全部'){
+                    this.queryParams.dataType = ''
+                }else{
+                    this.queryParams.dataType = this.params.itemTitles
+                }
+            } 
         }
         let params = {
             docType:this.params.parentTitles
@@ -188,6 +196,7 @@ export default {
             worknum:'',
             dataType:''
         },
+        assignStatus:0,
         userList:[],
         selectedNews: [],  
         isAllSelected: false,
@@ -284,6 +293,12 @@ export default {
         if(currentpage){
             currentPageTemp = currentpage
         }
+        let proofreaderTemp
+        if(this.queryParams.docStatus==0){
+            proofreaderTemp=''
+        }else{
+            proofreaderTemp = this.queryParams.proofreader1 ||this.queryParams.proofreader
+        }
         const params = {
           docType: this.queryParams.docType,
           datasourceName: this.queryParams.datasourceName,
@@ -299,7 +314,7 @@ export default {
           pageStatus:this.pageStatus,
           page:currentPageTemp,
           size:pagesizeTemp,
-          proofreader:this.queryParams.proofreader1 ||this.queryParams.proofreader
+          proofreader:proofreaderTemp
         };
         labelNewsList(params).then(res => {
             this.newDataList = res.data.docResList
@@ -374,13 +389,14 @@ export default {
                 assignArticle(params).then(res=>{
                     this.$message.success('分配成功！')
                 })
+                this.assignStatus = 1
+                setTimeout(() => {
+                    this.handleQuery()
+                }, 2000);
             }
         }else{
             this.$message.error('请选择标注人员！')
         }
-        setTimeout(() => {
-          this.handleQuery()
-        }, 2000);
         
     },
     handleAssignCancel(){
@@ -394,10 +410,10 @@ export default {
                 cancelAssignArticle(params).then(res=>{
                     this.$message.success('取消分配成功！')
                 })
+                setTimeout(() => {
+                    this.handleQuery()
+                }, 2000);
         }
-        setTimeout(() => {
-          this.handleQuery()
-        }, 2000);
     }
   },
   watch:{

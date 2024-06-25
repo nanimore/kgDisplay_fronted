@@ -83,7 +83,7 @@
 
         <el-form :model="queryParams" ref="queryParams" :inline="true">
             <el-form-item>
-                <el-button type="primary" @click="dialogFormVisible = true">上传书籍</el-button>               
+                <el-button type="primary" @click="dialogFormVisible = true" style="background-color: #00bfbf;color: white;border-color: #00bfbf">上传书籍</el-button>               
             </el-form-item>
             <el-form-item label="书籍名称" prop="bookName">
                 <el-input

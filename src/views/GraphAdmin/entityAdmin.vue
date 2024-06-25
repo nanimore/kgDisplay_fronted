@@ -70,7 +70,7 @@
             </div>
             <div class="rightContainer">
                 <div class="tag-group">
-                    <span class="tag-group__title">选择实例类型：</span>
+                    <span class="tag-group__title" >选择实例类型：</span>
                     <el-tag
                         v-for="node in selectedLeafNodes"
                         :key="node.id"
@@ -310,7 +310,7 @@ export default {
     .tag-group__title{
         font-size: 18px;
         font-weight: 700;
-        // color: #00FFFF;
+        color: #00FFFF;
         margin-left: 5px;
     }
     .el-tag--medium{
@@ -353,6 +353,12 @@ export default {
     ::v-deep .el-tree-node__content{
         background: url('../../assets/images/u376.svg') no-repeat;
         
+    }
+    ::v-deep .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content{
+        background: url('../../assets/images/u376.svg') no-repeat;
+    }
+    ::v-deep .el-tree-node__content:hover{
+        background: url('../../assets/images/u376.svg') no-repeat;
     }
 </style>
   

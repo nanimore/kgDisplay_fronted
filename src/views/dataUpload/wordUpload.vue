@@ -173,7 +173,7 @@
 
         <el-form :model="queryParams" ref="queryParams" :inline="true">
             <el-form-item>
-                <el-button type="primary" @click="dialogFormVisible = true">上传文档</el-button>    
+                <el-button type="primary" @click="dialogFormVisible = true" style="background-color: #00bfbf;color: white;border-color: #00bfbf">上传文档</el-button>    
                 <el-button type="primary" @click="multidialogFormVisible = true">批量上传文档</el-button>              
             </el-form-item>
             <el-form-item label="文档名称" prop="wordName">

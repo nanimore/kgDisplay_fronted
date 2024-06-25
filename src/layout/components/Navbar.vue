@@ -93,7 +93,7 @@ export default {
     },
     changeRoles(){
       this.$store.dispatch("ChangeRoles", this.changeRoles1).then(() => {
-          this.$router.push({ path: this.$route.path, query: { reload: Date.now() } }).catch(err => {});
+          this.$router.push({ path: '/index', query: { reload: Date.now() } }).catch(err => {});
         }).catch(() => {
       });
     },

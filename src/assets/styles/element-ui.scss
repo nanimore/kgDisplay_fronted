@@ -120,7 +120,21 @@
     }
   }
 }
-
+.el-table__header-wrapper .el-table__header .el-table__cell{
+  background-color: #027db4;
+  color: white;
+}
+.el-table__body .el-table__cell{
+  background-color: #111725;
+  color: white;
+  font-size: 12px;
+}
+.el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
+  background-color: #111725;
+  }
+.el-table__body tr.current-row > td.el-table__cell {
+  background-color: #111725;
+  }
 // to fixed https://github.com/ElemeFE/element/issues/2461
 .el-dialog {
   transform: none;

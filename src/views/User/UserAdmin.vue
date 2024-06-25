@@ -100,10 +100,17 @@
 </template>
   
 <script>
+import { getPersonalInfo,managePersonalInfo } from "@/api/userInfo/index";
 export default {
   name: "Index",
   created(){
     this.loadData()
+    let params = {
+        proofreader:''
+    }
+    managePersonalInfo(params).then(res=>{
+        console.log(res.data)
+    })
   },
   data() {
     return {
