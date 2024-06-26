@@ -392,6 +392,7 @@ export default {
                 this.assignStatus = 1
                 setTimeout(() => {
                     this.handleQuery()
+                    this.selectedNews =[]
                 }, 2000);
             }
         }else{
@@ -412,6 +413,7 @@ export default {
                 })
                 setTimeout(() => {
                     this.handleQuery()
+                    this.selectedNews =[]
                 }, 2000);
         }
     }

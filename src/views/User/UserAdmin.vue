@@ -3,8 +3,7 @@
         <el-form :model="queryParams" ref="queryParams" :inline="true">
             <el-form-item label="标注人员" prop="person">
                 <el-select v-model="queryParams.person" @change="selectPerson" filterable placeholder="请选择标注人员">
-                    <el-option label="A" value="Chinese"></el-option>
-                    <el-option label="B" value="English"></el-option>
+                    <el-option v-for="(item,index) in peopleList" :label="item" :value="item" :key="index"></el-option>
                 </el-select>
             </el-form-item>
         </el-form>
@@ -19,7 +18,7 @@
                 align="center">
             </el-table-column>
             <el-table-column
-                prop="person"
+                prop="proofreader"
                 label="标注人员"
                 width="150"
                 align="center">
@@ -30,59 +29,46 @@
                 align="center">
             </el-table-column>
             <el-table-column
-                prop="article1"
+                prop="receivedArticle"
                 label="已领取文章"
                 align="center">
             </el-table-column>
             <el-table-column
-                prop="article2"
+                prop="reviewArticle"
                 label="待审核文章"
                 align="center">
             </el-table-column>
             <el-table-column
-                prop="article3"
+                prop="notPassedArticle"
                 label="未通过文章"
                 align="center">
             </el-table-column>
             <el-table-column
-                prop="article4"
+                prop="reworkedArticle"
                 label="已返工文章"
                 align="center">
             </el-table-column>
             <el-table-column
-                prop="article5"
+                prop="passedArticle"
                 label="已通过文章"
                 align="center">
             </el-table-column>
             <el-table-column
-                prop="triplet1"
+                prop="labeledTriplets"
                 label="已标注三元组"
                 width="100"
                 align="center">
             </el-table-column>
             <el-table-column
-                prop="triplet2"
+                prop="passedTriplets"
                 label="已通过三元组"
                 width="100"
                 align="center">
             </el-table-column>
             <el-table-column
-                prop="salary"
-                label="已发放劳务"
+                prop="confirmedTriplets"
+                label="已确认三元组"
                 align="center">
-            </el-table-column>
-            <el-table-column
-                prop="allsalary"
-                label="总劳务"
-                align="center">
-            </el-table-column>
-            <el-table-column
-                label="劳务发放"
-                width="150"
-                align="center">
-                <template slot-scope="scope">
-                    <el-button type="primary" size="small" @click="sendSalary(scope.row)">发放</el-button>
-                </template>
             </el-table-column>
         </el-table>
         <div class="block" style="margin-top: 30px;">
@@ -100,16 +86,19 @@
 </template>
   
 <script>
-import { getPersonalInfo,managePersonalInfo } from "@/api/userInfo/index";
+import { managePersonalInfo } from "@/api/userInfo/index";
+import { getInitProofreaders } from "@/api/datalabel/label";
 export default {
   name: "Index",
   created(){
-    this.loadData()
     let params = {
         proofreader:''
     }
     managePersonalInfo(params).then(res=>{
-        console.log(res.data)
+        this.tableData= res.data
+    })
+    getInitProofreaders().then(res=>{
+        this.peopleList = res.data
     })
   },
   data() {
@@ -119,61 +108,8 @@ export default {
         queryParams: {
             person: '',
         },
-        tableData: [
-            {person:'wutianyu',datatype:'A',article1:'BBBBB',article2:'BBBBB',article3:'BBBBB',article4:'BBBBB',article5:'BBBBB',triplet1:'2000',triplet2:'4000',salary:'5000',allsalary:'4000'},
-            {
-                person:'lubenwei',
-                datatype:'A',
-                article1:'BBBBB',
-                article2:'BBBBB',
-                article3:'BBBBB',
-                article4:'BBBBB',
-                article5:'BBBBB',
-                triplet1:'2000',
-                triplet2:'4000',
-                salary:'5000',
-                allsalary:'4000'
-            },
-            {
-                person:'pengyuyan',
-                datatype:'A',
-                article1:'BBBBB',
-                article2:'BBBBB',
-                article3:'BBBBB',
-                article4:'BBBBB',
-                article5:'BBBBB',
-                triplet1:'2000',
-                triplet2:'4000',
-                salary:'5000',
-                allsalary:'4000'
-            },
-            {
-                person:'caixukun',
-                datatype:'A',
-                article1:'BBBBB',
-                article2:'BBBBB',
-                article3:'BBBBB',
-                article4:'BBBBB',
-                article5:'BBBBB',
-                triplet1:'2000',
-                triplet2:'4000',
-                salary:'5000',
-                allsalary:'4000'
-            },
-            {
-                person:'liuxiulei',
-                datatype:'A',
-                article1:'BBBBB',
-                article2:'BBBBB',
-                article3:'BBBBB',
-                article4:'BBBBB',
-                article5:'BBBBB',
-                triplet1:'2000',
-                triplet2:'4000',
-                salary:'5000',
-                allsalary:'4000'
-            }
-        ],
+        tableData: [],
+        peopleList:[]
     }
   },
   methods: {
@@ -192,15 +128,15 @@ export default {
         this.loadData()
     },
     loadData(){
-        console.log(this.queryParams.person)
-        console.log(this.currentPage)
-        console.log(this.pageSize)
+        let params = {
+            proofreader:this.queryParams.person
+        }
+        managePersonalInfo(params).then(res=>{
+            this.tableData=res.data
+        })
     }
   },
   computed: {
-    totalNum() {  
-        return this.tableData.length;  
-    }  
   }
 };
 
