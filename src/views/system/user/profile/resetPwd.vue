@@ -70,3 +70,8 @@ export default {
   }
 };
 </script>
+<style scoped lang="scss">
+::v-deep .el-form-item .el-form-item__label{
+  color: black !important;
+}
+</style>

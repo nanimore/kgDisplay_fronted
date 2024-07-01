@@ -3,14 +3,14 @@ import request from '@/utils/request'
   export function getPersonalInfo(query) {
     console.log(query)
     return request({
-      url: '/personalInfo',
+      url: '/user/personalInfo',
       method: 'post',
     })
   }
   export function managePersonalInfo(query) {
     console.log(query)
     return request({
-      url: '/managePersonalInfo',
+      url: '/user/managePersonalInfo',
       method: 'post',
       params:query
     })

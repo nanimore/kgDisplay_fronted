@@ -94,7 +94,7 @@ export function updateUserPwd(oldPassword, newPassword) {
     newPassword
   }
   return request({
-    url: '/changepw',
+    url: '/user/changepw',
     method: 'post',
     data: data
   })

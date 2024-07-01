@@ -21,12 +21,6 @@
         </el-dialog>
         
         <el-form :model="queryParams" ref="queryParams" :inline="true">
-            <el-form-item label="标注人员" prop="person">
-                <el-select v-model="queryParams.person" filterable placeholder="请选择标注人员">
-                    <el-option label="A" value="Chinese"></el-option>
-                    <el-option label="B" value="English"></el-option>
-                </el-select>
-            </el-form-item>
             <el-form-item label="标注时间" prop="time">
                 <el-date-picker
                     v-model="queryParams.time"
@@ -98,6 +92,12 @@
                     <el-table-column
                         prop="entitytype"
                         label="实例类型"
+                        align="center">
+                    </el-table-column>
+                    <el-table-column
+                        prop="time"
+                        width="180"
+                        label="标注时间"
                         align="center">
                     </el-table-column>
                     <el-table-column
@@ -176,7 +176,6 @@ export default {
         dialogVisible: false,
         queryParams: {
             keyword: '',
-            person: '',
             time: ''
         },
         rowName:'',

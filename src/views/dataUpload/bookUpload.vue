@@ -2,7 +2,7 @@
     <div class="app-container">
         <el-dialog title="上传书籍" :visible.sync="dialogFormVisible" center :close-on-click-modal="false"  width="35%" custom-class="my-dialog">
             <el-form :model="form" ref="form" :rules="rules" :label-position="labelPosition"  label-width="140px">
-                <el-form-item label="上传书籍">
+                <el-form-item label="选择文件">
                     <el-upload
                         class="upload-demo"
                         action="https://jsonplaceholder.typicode.com/posts/"
@@ -232,7 +232,7 @@ export default {
             { required: true, message: '请选择文本是否可以复制'},
           ],
           targettype:[
-            { required: true, message: '请选择文本是否可以复制'},
+            { required: true, message: '请选择目标类型'},
           ]
         },
         tableData:[
