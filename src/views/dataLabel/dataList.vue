@@ -31,8 +31,8 @@
                         </el-option-group>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="任务数量" prop="worknum" style="margin-bottom: 0;">
-                    <el-input v-model="form.worknum" placeholder="请输入任务数量1-100"></el-input>
+                <el-form-item label="任务数量" prop="quantity" style="margin-bottom: 0;">
+                    <el-input v-model="form.quantity" placeholder="请输入任务数量1-100"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer" style="text-align: center;">
@@ -189,14 +189,14 @@ export default {
         initDocCategory:[],
         form:{
             docType:'',
-            worknum:'',
+            quantity:'',
             dataType:''
         },
         rules: {
         docType: [
             { required: true, message: '请选择数据源类型'},
           ],
-          worknum: [
+          quantity: [
             { required: true, message: '请选择数据类型'},
           ],
           dataType: [
@@ -260,6 +260,9 @@ export default {
     resetQuery(){
         this.resetForm("queryParams")
         this.handleQuery()
+    },
+    submitForm(){
+
     },
     handleQuery(pageSize,currentpage){
         let disstartDate ='';

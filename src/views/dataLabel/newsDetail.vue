@@ -185,7 +185,7 @@
 </template>
 
 <script>
-import { annotationFistPage,getEntityList,discard,getEntityNameByEntityType,deleteEntity,getPropList } from "@/api/datalabel/label";
+import { annotationFistPage,getEntityList,discard,getEntityNameByEntityType,deleteEntity,getPropList,chineseAnnotation } from "@/api/datalabel/label";
 import { getAllEntityType } from "@/api/index";
 export default {
   props:['params'],
@@ -261,10 +261,12 @@ export default {
   methods: {
     extractText(){
       this.fullscreenLoading = true;
-      setTimeout(() => {
+      chineseAnnotation(this.passageDetail).then(res=>{
+        this.passageDetail = res.data
+        this.highlightText()
+        this.getEntityListFunction()
         this.fullscreenLoading = false;
-        this.extractData = this.entityListData
-      }, 2000);
+      })
     },
     addSelfProp(){
       this.formVisible = true;
@@ -497,6 +499,8 @@ export default {
   list-style-type: none;
   padding-left: 0;
   font-size: 12px;
+  max-height: 60vh;
+  overflow-y: auto;
   li{
     border-bottom: 1px solid #cecece;
     padding-bottom: 5px;
@@ -578,7 +582,7 @@ export default {
   padding: 10px 0;
   height:71vh;
   overflow-y: scroll;
-  font-size: 12px;
+  font-size: 14px;
 }
 ::v-deep .el-dialog{
   .el-form-item__label{

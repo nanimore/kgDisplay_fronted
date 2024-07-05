@@ -110,3 +110,17 @@ import request from '@/utils/request'
       data: query,
     })
   }
+  export function chineseAnnotation(query) {
+    return request({
+      url: '/proofread/AnnotationPage',
+      method: 'post',
+      data: query,
+    })
+  }
+  export function pullData(query) {
+    return request({
+      url: '/proofread/pullData',
+      method: 'post',
+      data: query,
+    })
+  }

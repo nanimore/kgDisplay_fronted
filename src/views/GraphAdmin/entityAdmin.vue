@@ -76,7 +76,8 @@
                 </div>
                 <el-table
                     :data="tableData"
-                    border>
+                    border
+                    height="500">
                     <el-table-column
                         label="序号"
                         type="index"
@@ -84,50 +85,51 @@
                         align="center">
                     </el-table-column>
                     <el-table-column
-                        prop="entityname"
+                        prop="entityName"
                         label="实例名称"
                         width="130"
                         align="center">
                     </el-table-column>
                     <el-table-column
-                        prop="entitytype"
+                        prop="entityType"
                         label="实例类型"
                         align="center">
                     </el-table-column>
                     <el-table-column
-                        prop="time"
-                        width="180"
+                        prop="createTime"
+                        width="240"
                         label="标注时间"
                         align="center">
                     </el-table-column>
                     <el-table-column
-                        prop="chinesename"
+                        prop="chineseFullName"
                         label="中文全称"
                         width="130"
                         align="center">
                     </el-table-column>
                     <el-table-column
-                        prop="chinesesimplename"
+                        prop="chineseSimpleName"
                         label="中文简称"
                         align="center">
                     </el-table-column>
                     <el-table-column
-                        prop="chinesealias"
+                        prop="chineseAliasName"
                         label="中文别名"
-                        align="center">
+                        align="center"
+                        width="130">
                     </el-table-column>
                     <el-table-column
-                        prop="englishname"
+                        prop="englishFullName"
                         label="英文全称"
                         align="center">
                     </el-table-column>
                     <el-table-column
-                        prop="englishsimplename"
+                        prop="englishSimpleName"
                         label="英文简称"
                         align="center">
                     </el-table-column>
                     <el-table-column
-                        prop="englishalias"
+                        prop="englishAliasName"
                         label="英文别名"
                         width="100"
                         align="center">
@@ -137,7 +139,7 @@
                         width="120"
                         align="center">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.isData==true" style="color: #1890ff;cursor: pointer;" @click="viewOtherName(scope.row)">点击查看</span>
+                            <span v-if="scope.row.anotherName.length!=0" style="color: #1890ff;cursor: pointer;" @click="viewOtherName(scope.row)">点击查看</span>
                             <span v-else >点击查看</span>
                         </template>
                     </el-table-column>
@@ -154,10 +156,10 @@
                         @size-change="handleSizeChange"
                         @current-change="handleCurrentChange"
                         :current-page="currentPage"
-                        :page-sizes="[10, 20, 30, 40]"
+                        :page-sizes="[10, 20, 40, 60, 80, 100]"
                         :page-size="pageSize"
                         layout="total, sizes, prev, pager, next, jumper"
-                        :total="10">
+                        :total="totalNum">
                     </el-pagination>
                 </div>
             </div>
@@ -166,6 +168,7 @@
 </template>
   
 <script>
+import { getInitDocList } from "@/api/entityAdmin/index";
 export default {
   name: "Index",
   created(){
@@ -182,13 +185,8 @@ export default {
         filterText: '',
         currentPage: 1,
         pageSize: 10,
-        tableData: [
-            {entityname:'亚特兰大级轻型巡洋舰',entitytype:'巡洋舰',chinesename:'CL51亚特兰大级轻型巡洋舰',chinesesimplename:'',chinesealias:'CL51亚特兰大',englishname:'',englishsimplename:'Atlanta; USS Atlanta',englishalias:'',isData:true,japanesename:'1',japanesesimplename:'2',japanesealias:'3',russianame:'4',russiasimplename:'5',russiaalias:'6',koreanname:'7',koreansimplename:'8',koreanalias:'9'},
-            {entityname:'亚特兰大级轻型巡洋舰1',entitytype:'巡洋舰',chinesename:'CL51亚特兰大级轻型巡洋舰',chinesesimplename:'',chinesealias:'CL51亚特兰大',englishname:'',englishsimplename:'Atlanta; USS Atlanta',englishalias:'',isData:false},
-            {entityname:'亚特兰大级轻型巡洋舰2',entitytype:'巡洋舰',chinesename:'CL51亚特兰大级轻型巡洋舰',chinesesimplename:'',chinesealias:'CL51亚特兰大',englishname:'',englishsimplename:'Atlanta; USS Atlanta',englishalias:'',isData:true},
-            {entityname:'亚特兰大级轻型巡洋舰3',entitytype:'巡洋舰',chinesename:'CL51亚特兰大级轻型巡洋舰',chinesesimplename:'',chinesealias:'CL51亚特兰大',englishname:'',englishsimplename:'Atlanta; USS Atlanta',englishalias:'',isData:true},
-            {entityname:'亚特兰大级轻型巡洋舰4',entitytype:'巡洋舰',chinesename:'CL51亚特兰大级轻型巡洋舰',chinesesimplename:'',chinesealias:'CL51亚特兰大',englishname:'',englishsimplename:'Atlanta; USS Atlanta',englishalias:'',isData:false},
-        ],
+        tableData: [],
+        totalNum:100,
         otherData:{},
         data: [{
           id: 1,
@@ -234,23 +232,49 @@ export default {
   },
   methods: {
     handleSizeChange(pageSize){
-        this.pageSize = pageSize
-        this.loadData()
+        this.loadData(pageSize,this.currentPage)
     },
     handleCurrentChange(currentpage){
-        this.currentPage = currentpage
-        this.loadData()
+        this.loadData(this.pageSize,currentpage)
     },
-    loadData(){
-        console.log(this.queryParams)
+    loadData(pageSize,currentpage){
+        let disstartDate ='';
+        let disendDate = '';
+        if(this.queryParams.time.length === 2){
+            disstartDate = this.formatDate(this.queryParams.time[0]);
+            disendDate = this.formatDate(this.queryParams.time[1]);
+        }
+        let pagesizeTemp =this.pageSize
+        let currentPageTemp = this.currentPage
+        if(pageSize){
+            pagesizeTemp = pageSize 
+        }
+        if(currentpage){
+            currentPageTemp = currentpage
+        }
+        let params = {
+            createTimeEnd:disendDate,
+            createTimeStart:disstartDate,
+            entityType:'',
+            keyword:this.queryParams.keyword,
+            page:currentPageTemp,
+            size:pagesizeTemp
+        }
+        getInitDocList(params).then(res=>{
+            this.tableData = res.data.entityIndexList
+            this.totalNum = res.data.totalCount
+        })
     },
     resetForm(formName) {
         this.$refs[formName].resetFields();
+        this.currentPage = 1
+        this.pageSize = 10
+        this.loadData()
     },
     viewOtherName(data){
         this.dialogVisible = true;
         this.rowName = data.entityname
-        this.otherData = data
+        this.otherData = data.anotherName
     },
     filterNode(value, data) {
         if (!value) return true;
@@ -261,7 +285,6 @@ export default {
       this.selectedLeafNodes = [];
     },
     selectNodes(checkedNodes, checkedKeys) {
-        console.log(this.$refs.tree.getCheckedNodes())
         this.selectedLeafNodes = this.getLeafNodes(this.$refs.tree.getCheckedNodes());
     },
     getLeafNodes(nodes) {
@@ -277,6 +300,16 @@ export default {
       // 取消选中节点
       this.$refs.tree.setChecked(node.id, false);
       this.selectedLeafNodes = this.selectedLeafNodes.filter(item => item.id !== node.id);
+    },
+    formatDate(date) {
+      const d = new Date(date);
+      const year = String(d.getFullYear());  // 获取年份的后两位
+      const month = String(d.getMonth() + 1).padStart(2, '0');  // 获取月份，并补零
+      const day = String(d.getDate()).padStart(2, '0');  // 获取日期，并补零
+      const hours = String(d.getHours()).padStart(2, '0');  // 获取小时，并补零
+      const minutes = String(d.getMinutes()).padStart(2, '0');  // 获取分钟，并补零
+      const seconds = String(d.getSeconds()).padStart(2, '0');  // 获取秒，并补零
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
   },
   watch: {
