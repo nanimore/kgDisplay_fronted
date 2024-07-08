@@ -121,6 +121,14 @@ import request from '@/utils/request'
     return request({
       url: '/proofread/pullData',
       method: 'post',
+      params: query,
+    })
+  }
+  
+  export function getAllLeafEntityTypes(query) {
+    return request({
+      url: '/Metadata/getAllLeafEntityTypes',
+      method: 'get',
       data: query,
     })
   }

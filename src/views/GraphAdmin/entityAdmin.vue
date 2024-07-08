@@ -261,7 +261,7 @@ export default {
             size:pagesizeTemp
         }
         getInitDocList(params).then(res=>{
-            this.tableData = res.data.entityIndexList
+            this.tableData = res.data.entityResList
             this.totalNum = res.data.totalCount
         })
     },

@@ -14,7 +14,7 @@
                 <el-form-item :label="selfdefine?'自定义类型:':'实例类型:'" prop="entityType" v-if="isEditEntityName1">
                   <el-select v-if="!selfdefine" v-model="addEntityForm.entityType" filterable placeholder="请选择实例类型" style="width: 300px;" @change="getEntityNameByEntityTypeFunction()">
                     <el-option
-                            v-for="group in entityTypeList"
+                            v-for="group in addEntityTypeList"
                             :key="group.index"
                             v-if="group.children==null"
                             :label="group.name"
@@ -185,7 +185,7 @@
 </template>
 
 <script>
-import { annotationFistPage,getEntityList,discard,getEntityNameByEntityType,deleteEntity,getPropList,chineseAnnotation } from "@/api/datalabel/label";
+import { annotationFistPage,getEntityList,discard,getEntityNameByEntityType,deleteEntity,getPropList,chineseAnnotation,getAllLeafEntityTypes } from "@/api/datalabel/label";
 import { getAllEntityType } from "@/api/index";
 export default {
   props:['params'],
@@ -214,6 +214,7 @@ export default {
         passageDetail:{},
         dialogFormVisible:false,
         selfdefine:false,
+        addEntityTypeList:[],
         addEntityForm:{
           entityType:'',
           entityName:'',
@@ -277,6 +278,9 @@ export default {
     getAllEntityType(){
       getAllEntityType().then(res=>{
         this.entityTypeList = res.data
+      })
+      getAllLeafEntityTypes().then(res=>{
+        this.addEntityTypeList = res.data
       })
     },
     startEditing(index) {  

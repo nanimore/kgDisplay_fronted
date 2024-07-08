@@ -156,7 +156,7 @@
 </template>
   
 <script>
-import { labelNewsList,getinitDocType,getInitDocCategory } from "@/api/datalabel/label";
+import { labelNewsList,getinitDocType,getInitDocCategory,pullData } from "@/api/datalabel/label";
 export default {
   name: "dataLabel",
   created(){
@@ -193,13 +193,13 @@ export default {
             dataType:''
         },
         rules: {
-        docType: [
+          docType: [
             { required: true, message: '请选择数据源类型'},
           ],
-          quantity: [
+          dataType: [
             { required: true, message: '请选择数据类型'},
           ],
-          dataType: [
+          quantity: [
             { required: true, message: '请输入任务数量'},
             ]
         },
@@ -261,8 +261,21 @@ export default {
         this.resetForm("queryParams")
         this.handleQuery()
     },
-    submitForm(){
-
+    submitForm(formName){
+        let params = {
+            dataType:this.form.dataType,
+            docType:this.form.docType,
+            quantity:this.form.quantity
+        }
+        this.$refs[formName].validate((valid) => {
+            if (valid) {
+                pullData(params).then(res=>{
+                 if(res.code == 200){
+                    this.$message.success('领取数据成功！')
+                 }
+                })
+            }
+        })
     },
     handleQuery(pageSize,currentpage){
         let disstartDate ='';
