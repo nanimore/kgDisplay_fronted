@@ -381,10 +381,10 @@ export default {
             if(this.selectedNews.length == 0){
                 this.$message.error('请选择需要分配的新闻！')
             }else{
-                let newArray = this.selectedNews.map(item => ({ docId: item.articleId, docType: item.docType }));  
+                let newArray = this.selectedNews.map(item => ({ docId: item.articleId, docType: item.docType, docStatus:item.docStatus,dataType:item.dataType,uuid:item.articleId }));  
                 let params = {
                     proofreader:this.queryParams.proofreader,
-                    articleReqList:newArray
+                    articleReqList:newArray,
                 }
                 assignArticle(params).then(res=>{
                     this.$message.success('分配成功！')
@@ -404,7 +404,7 @@ export default {
         if(this.selectedNews.length == 0){
                 this.$message.error('请选择需要取消分配的新闻！')
             }else{
-                let newArray = this.selectedNews.map(item => ({ docId: item.articleId, docType: item.docType }));  
+                let newArray = this.selectedNews.map(item => ({ docId: item.articleId, docType: item.docType, docStatus:item.docStatus,dataType:item.dataType,uuid:item.articleId }));  
                 let params = {
                     articleReqList:newArray
                 }

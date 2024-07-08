@@ -154,13 +154,12 @@ export default {
     },
     changeDataType(){
         let params={
-            dataType: this.dataType,
-            docInfoReq: {
                 docId: this.params.articleId,
                 docStatus: this.params.docStatus,
                 docType: this.params.docType,
-                uuid: this.params.articleId
-            }
+                uuid: this.params.articleId,
+                dataType:this.params.dataType
+
         }
         updateDataType(params).then(res=>{
             if(res.code==200){

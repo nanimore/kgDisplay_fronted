@@ -271,7 +271,10 @@ export default {
             if (valid) {
                 pullData(params).then(res=>{
                  if(res.code == 200){
-                    this.$message.success('领取数据成功！')
+                    this.$message.success(res.data)
+                    this.dialogFormVisible = false
+                    setTimeout
+                    this.handleQuery()
                  }
                 })
             }

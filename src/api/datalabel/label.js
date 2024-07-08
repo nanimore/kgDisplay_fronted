@@ -132,3 +132,10 @@ import request from '@/utils/request'
       data: query,
     })
   }
+  export function similarInstanceNames(query) {
+    return request({
+      url: '/proofread/similarInstanceNames',
+      method: 'post',
+      params: query,
+    })
+  }

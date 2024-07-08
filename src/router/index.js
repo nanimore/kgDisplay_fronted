@@ -178,6 +178,19 @@ export const constantRoutes = [
         meta: { title: '视频上传'}
       }
     ]
+  },
+  {
+    path: '/dataReview',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'networkwideEnd',
+        component: () => import('@/views/dataUpload/bookUpload'),
+        name: 'networkwideEnd',
+        meta: { title: '书籍上传'}
+      }
+    ]
   }
 ]
 

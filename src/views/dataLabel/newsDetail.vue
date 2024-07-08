@@ -12,7 +12,7 @@
         </el-dialog>
             <el-form :model="addEntityForm" ref="addEntityForm" :rules="rules" :label-position="labelPosition" label-width="100px">
                 <el-form-item :label="selfdefine?'自定义类型:':'实例类型:'" prop="entityType" v-if="isEditEntityName1">
-                  <el-select v-if="!selfdefine" v-model="addEntityForm.entityType" filterable placeholder="请选择实例类型" style="width: 300px;" @change="getEntityNameByEntityTypeFunction()">
+                  <el-select v-if="!selfdefine" v-model="addEntityForm.entityType" filterable placeholder="请选择实例类型" style="width: 300px;">
                     <el-option
                             v-for="group in addEntityTypeList"
                             :key="group.index"
@@ -21,7 +21,7 @@
                             :value="group.name"
                         ></el-option>
                         <el-option-group
-                            v-for="group in entityTypeList"
+                            v-for="group in addEntityTypeList"
                             :key="group.name"
                             v-if="group.children"
                             :label="group.name"
@@ -41,7 +41,7 @@
                   {{ nowlabelEntityType }}
                 </el-form-item>
                 <el-form-item label="实例名称:" prop="entityName">
-                    <el-select v-model="addEntityForm.entityName" allow-create filterable placeholder="请选择实例名称" style="width: 300px;">
+                    <el-select v-model="addEntityForm.entityName" allow-create filterable remote :remote-method="remoteMethod" placeholder="请选择实例名称" style="width: 300px;">
                         <el-option v-for="item in entityNameList" :key="item" :label="item" :value="item"></el-option>
                     </el-select>
                     <span @click="getNameRegualation()" v-show="!selfdefine" style="color: #FFFF00;margin-left: 15px;cursor: pointer;font-size: 12px;">名称规范示例</span>
@@ -185,7 +185,7 @@
 </template>
 
 <script>
-import { annotationFistPage,getEntityList,discard,getEntityNameByEntityType,deleteEntity,getPropList,chineseAnnotation,getAllLeafEntityTypes } from "@/api/datalabel/label";
+import { annotationFistPage,getEntityList,discard,getEntityNameByEntityType,deleteEntity,getPropList,chineseAnnotation,getAllLeafEntityTypes,similarInstanceNames } from "@/api/datalabel/label";
 import { getAllEntityType } from "@/api/index";
 export default {
   props:['params'],
@@ -397,6 +397,20 @@ export default {
             return false;
           }
         });
+    },
+    remoteMethod(query) {
+        let params = {
+          subject: query
+        }
+        if (query !== '') {
+          setTimeout(() => {
+            similarInstanceNames(params).then(res=>{
+              this.entityNameList = res.data
+            })
+          }, 200);
+        } else {
+          this.entityNameList = [];
+        }
     },
     getEntityNameByEntityTypeFunction(){
       let params
