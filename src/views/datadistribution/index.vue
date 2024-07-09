@@ -9,7 +9,7 @@
           </el-form-item>
           <div class="break-line-div" v-if="isDropData"></div>
           <el-form-item label="数据源类型" prop="docType">
-              <el-select v-model="queryParams.docType" placeholder="请选择" style="width: 150px;">
+              <el-select v-model="queryParams.docType" placeholder="请选择" style="width: 150px;" @change="handleDataSourceTypeChange()">
                   <el-option v-for="item in initDocTypeList" :label="item" :value="item" :key="item"></el-option>
               </el-select>
           </el-form-item>
@@ -234,6 +234,14 @@ export default {
     };
   },
   methods: {
+    handleDataSourceTypeChange(){
+        let params = {
+            docType:this.queryParams.docType
+        }
+        getInitDatasourceName(params).then(res=>{
+            this.initDocNameList = res.data
+        })
+    },
     getStatusClass(status) {
       return {
         'status-8': status === 0,
