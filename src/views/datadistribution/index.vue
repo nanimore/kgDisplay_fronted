@@ -396,12 +396,13 @@ export default {
                 }
                 assignArticle(params).then(res=>{
                     this.$message.success('分配成功！')
+                    this.assignStatus = 1
+                    setTimeout(() => {
+                        this.handleQuery()
+                        this.selectedNews =[]
+                    }, 2000);
                 })
-                this.assignStatus = 1
-                setTimeout(() => {
-                    this.handleQuery()
-                    this.selectedNews =[]
-                }, 2000);
+                
             }
         }else{
             this.$message.error('请选择标注人员！')
@@ -418,11 +419,12 @@ export default {
                 }
                 cancelAssignArticle(params).then(res=>{
                     this.$message.success('取消分配成功！')
+                    setTimeout(() => {
+                        this.handleQuery()
+                        this.selectedNews =[]
+                    }, 2000);
                 })
-                setTimeout(() => {
-                    this.handleQuery()
-                    this.selectedNews =[]
-                }, 2000);
+                
         }
     }
   },

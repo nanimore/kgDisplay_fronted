@@ -8,15 +8,7 @@
             :close-on-click-modal="false"
             custom-class="viewDialog">
             <el-descriptions class="margin-top" :column="1" border>
-                <el-descriptions-item label="日文全称">{{ otherData.japanesename }}</el-descriptions-item>
-                <el-descriptions-item label="日文简称">{{ otherData.japanesesimplename }}</el-descriptions-item>
-                <el-descriptions-item label="日文别名">{{ otherData.japanesealias }}</el-descriptions-item>
-                <el-descriptions-item label="俄文全称">{{ otherData.russianame }}</el-descriptions-item>
-                <el-descriptions-item label="俄文简称">{{ otherData.russiasimplename }}</el-descriptions-item>
-                <el-descriptions-item label="俄文别名">{{ otherData.russiaalias }}</el-descriptions-item>
-                <el-descriptions-item label="韩文全称">{{ otherData.koreanname }}</el-descriptions-item>
-                <el-descriptions-item label="韩文简称">{{ otherData.koreansimplename }}</el-descriptions-item>
-                <el-descriptions-item label="韩文别名">{{ otherData.koreanalias }}</el-descriptions-item>
+                <el-descriptions-item v-for="item in otherNameList" :label="item.name">{{ item.value }}</el-descriptions-item>
             </el-descriptions>
         </el-dialog>
         
@@ -187,7 +179,7 @@ export default {
         pageSize: 10,
         tableData: [],
         totalNum:100,
-        otherData:{},
+        otherNameList:[],
         data: [{
           id: 1,
           label: '一级 1',
@@ -274,7 +266,7 @@ export default {
     viewOtherName(data){
         this.dialogVisible = true;
         this.rowName = data.entityname
-        this.otherData = data.anotherName
+        this.otherNameList = data.anotherName
     },
     filterNode(value, data) {
         if (!value) return true;
