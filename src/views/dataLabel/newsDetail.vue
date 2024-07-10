@@ -113,7 +113,7 @@
             <el-button type="primary" size="mini" @click="isEditEntityName()">修改实例名称/文本</el-button>
             <span style="float: right;display: flex;align-items: center;margin-top: 3px;">
               <img src="../../assets/images/u1782.svg" alt="" @click="dropEntity()" style="width:20px;height: 20px;cursor: pointer;margin-right: 10px;">
-              <img src='../../assets/images/u1890.svg' @click="isDetail = true" style="width:20px;height: 20px;cursor: pointer;"></img>
+              <img src='../../assets/images/u1890.svg' @click="backToEntityList()" style="width:20px;height: 20px;cursor: pointer;"></img>
             </span>
           </div>
           <el-tabs class="entityDetailInnerContent" style="margin-top: 10px;color: #02A7F0;">
@@ -149,34 +149,39 @@
               </el-form> 
             </el-tab-pane>
             <el-tab-pane label="实例关系">
-              <el-form :model="relform" ref="relform" label-width="120px">  
-                <el-form-item  
-                  v-for="(item, index) in RelformItems"  
-                  :key="index"  
-                  :label="item.label"  
-                  :prop="item.prop"  
-                >  
-                  <el-input  
-                    v-if="!item.isEditing"  
-                    v-model="relform[item.prop]"  
-                    @focus="startEditing(index)"  
-                    placeholder="点击编辑"  
-                  ></el-input>  
-                  <span v-else>{{ relform[item.prop] }}</span>  
-                  <el-button  
-                    type="text"  
-                    icon="el-icon-edit"  
-                    @click="startEditing(index)"  
-                    v-if="!item.isEditing"  
-                  >编辑</el-button>  
-                  <el-button  
-                    type="text"  
-                    icon="el-icon-check"  
-                    @click="saveAndHide(index)"  
-                    v-if="item.isEditing"  
-                  >保存</el-button>  
-                </el-form-item>  
-              </el-form>  
+              <div class="addRelClass">
+                <span class="addRelClassContainer" @click="addEntity('addEntityForm')"><img src="../../assets/images/u3832.svg" class="addClass">添加实例</span>
+                <span class="addRelClassContainer" @click="addrelForm()" style="margin-left: 20px;"><img src="../../assets/images/u3832.svg" class="addClass">添加关系</span>
+              </div>
+              <div v-for="(form, index) in relforms" :key="form.id">
+                <el-card class="form-card">
+                  <div slot="header">
+                    <span>表单 {{ index + 1 }}</span>
+                    <el-button type="text" @click="editForm(index)" v-if="!form.editing">编辑</el-button>
+                    <el-button type="text" @click="saveForm(index)" v-if="form.editing">保存</el-button>
+                  </div>
+                  <div v-if="form.editing">
+                    <el-form :model="form">
+                      <el-form-item label="字段1">
+                        <el-input v-model="form.field1"></el-input>
+                      </el-form-item>
+                      <el-form-item label="字段2">
+                        <el-input v-model="form.field2"></el-input>
+                      </el-form-item>
+                    </el-form>
+                  </div>
+                  <div v-else>
+                    <el-form :model="form">
+                      <el-form-item label="字段1">
+                        <span>{{ form.field1 }}</span>
+                      </el-form-item>
+                      <el-form-item label="字段2">
+                        <span>{{ form.field2 }}</span>
+                      </el-form-item>
+                    </el-form>
+                  </div>
+                </el-card>
+              </div>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -185,7 +190,7 @@
 </template>
 
 <script>
-import { annotationFistPage,getEntityList,discard,getEntityNameByEntityType,deleteEntity,getPropList,chineseAnnotation,getAllLeafEntityTypes,similarInstanceNames } from "@/api/datalabel/label";
+import { annotationFistPage,getEntityList,discard,getEntityNameByEntityType,deleteEntity,getPropList,chineseAnnotation,getAllLeafEntityTypes,similarInstanceNames,addInstance } from "@/api/datalabel/label";
 import { getAllEntityType } from "@/api/index";
 export default {
   props:['params'],
@@ -210,6 +215,7 @@ export default {
         form:{},
         formItems:[],
         propForm:{},
+        relforms:[],
         isDetail:true,
         passageDetail:{},
         dialogFormVisible:false,
@@ -220,6 +226,7 @@ export default {
           entityName:'',
           text:''
         },
+        nowEditEntityId:'',
         relform: {}, // 用于存储表单数据的对象  
         RelformItems: [ // 假设这是从接口获取的表单结构  
           { label: '用户名', prop: 'username', isEditing: false },  
@@ -283,19 +290,37 @@ export default {
         this.addEntityTypeList = res.data
       })
     },
-    startEditing(index) {  
-      this.RelformItems[index].isEditing = true;  
-    },  
-    saveAndHide(index) {  
-      this.RelformItems[index].isEditing = false;  
- 
-    },  
+    addrelForm() {
+      this.relforms.push({
+        id: Date.now(),
+        field1: '',
+        field2: '',
+        editing: true
+      });
+    },
+    saveForm(index) {
+      const form = this.relforms[index];
+      // 假设这里有一个API接口保存表单数据
+      // axios.post('/api/forms', form).then(() => {
+      //   this.$set(this.forms, index, { ...form, editing: false });
+      // });
+      this.$set(this.relforms, index, { ...form, editing: false });
+    },
+    editrelForm(index) {
+      this.$set(this.relforms, index, { ...this.relforms[index], editing: true });
+    },
     dropEntity(item){
+      let id 
+      if(this.nowEditEntityId){
+        id = this.nowEditEntityId
+      }else{
+        id = item.uuid
+      }
       let deleteEntityParams = {
         docId:this.params.articleId,
         docStatus:this.params.docStatus,
         docType:this.params.docType,
-        uuid:item.uuid
+        uuid:id
       }
       this.$confirm('是否删除该实例?', '提示', {
           confirmButtonText: '确定',
@@ -374,6 +399,7 @@ export default {
       this.nowlabelEntityType = item.entityType
       this.getEntityNameByEntityTypeFunction()
       this.getPropListFunction(item.uuid)
+      this.nowEditEntityId = item.uuid
     },
     getPropListFunction(id){
       let params = {
@@ -389,6 +415,17 @@ export default {
     submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
+            let params = {
+              Verify:{
+                tripleText:this.addEntityForm.text,
+                subject:this.addEntityForm.entityName,
+                object:this.addEntityForm.entityType
+              },
+              EquipOrSplitReq:this.passageDetail
+            }
+            addInstance(params).then(res => {
+              console.log(res)
+            })
             this.$message.success('添加成功!');
             this.resetForm(formName)
             this.dialogFormVisible = false;
@@ -476,6 +513,10 @@ export default {
     aliasFindHighLight(data){
       this.searchQuery = data
       this.highlightText()
+    },
+    backToEntityList(){
+      this.isDetail = true
+      this.nowEditEntityId = ''
     },
     isEditEntityName(){
       // getEntityNameByEntityType
@@ -597,6 +638,7 @@ export default {
   overflow-y: scroll;
   font-size: 14px;
 }
+
 ::v-deep .el-dialog{
   .el-form-item__label{
     color: #00FFFF;
@@ -683,5 +725,22 @@ export default {
 ::v-deep .el-tabs__content{
   height: 70vh;
   overflow-y: scroll;
+}
+.addRelClass{
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  height: 20px;
+  line-height: 20px;
+}
+.addRelClassContainer{
+  display:flex;
+  cursor: pointer;
+}
+.addClass{
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
 }
 </style>

@@ -139,3 +139,10 @@ import request from '@/utils/request'
       params: query,
     })
   }
+  export function addInstance(query) {
+    return request({
+      url: '/proofread/addInstance',
+      method: 'post',
+      data: query,
+    })
+  }
