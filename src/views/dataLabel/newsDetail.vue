@@ -413,15 +413,9 @@ export default {
         }
     },
     getEntityNameByEntityTypeFunction(){
-      let params
-      if(this.addEntityForm.entityType){
-        params= {
-          entityType:this.addEntityForm.entityType
-        }
-      }else{
-        params= {
+      let params = {
           entityType:this.nowlabelEntityType
-        }
+        
       }
       getEntityNameByEntityType(params).then(res=>{
         this.entityNameList = res.data
@@ -531,6 +525,7 @@ export default {
         margin-right: 10px;
         cursor: pointer;
       }
+      
       img {
         cursor: pointer;
       }
