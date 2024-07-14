@@ -28,12 +28,10 @@
                   <el-tree
                       :data="data"
                       :props="defaultProps"
-                      default-expand-all
                       :filter-node-method="filterNode"
                       ref="tree"
                       node-key="id"
                       highlight-current
-                      expand-on-click-node
                       @check="selectNodes">
                   </el-tree>
                 </div>
@@ -72,6 +70,7 @@ export default {
         pageSize: 10,
         tableData: [],
         totalNum:100,
+        activeName: 'first',
         otherNameList:[],
         data: [{
           id: 1,
@@ -276,9 +275,10 @@ export default {
     }
     ::v-deep .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content{
         background: url('../../assets/images/u376.svg') no-repeat;
+        color: #169BD5;
     }
     ::v-deep .el-tree-node__content:hover{
-        background: url('../../assets/images/u376.svg') no-repeat;
+        background: url('../../assets/images/u376.svg') no-repeat !important;
     }
     ::v-deep .el-tabs{
         .is-active{

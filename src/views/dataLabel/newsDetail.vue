@@ -159,7 +159,10 @@
                       <el-row>
                         <el-col :span="14" >
                           <el-form-item label="头实例名称">
-                            <span style="color: #FFFF00;">{{ nowlabelEntityName }}</span>
+                            <span v-if="form.isChangeSort" style="color: #FFFF00;">{{ nowlabelEntityName }}</span>
+                            <el-select v-else v-model="form.entityName1" allow-create filterable remote :remote-method="remoteMethodEntityList" placeholder="请选择实例名称" style="width: 100%;" @change="nowremoteIndex = index">
+                                <el-option v-for="item in form.entityNameListbyRel" :key="item" :label="item" :value="item"></el-option>
+                            </el-select>  
                           </el-form-item>
                         </el-col>
                         <el-col :span="2">
@@ -174,7 +177,7 @@
                             <el-input v-model="form.relation" style="width:  100%;"></el-input>
                           </el-form-item>
                           <el-form-item label="关系名称" v-else>
-                            <el-select v-model="form.relation" filterable placeholder="请选择实例名称" style="width: 100%;" @change="getEntityByRelationFunction(index)">
+                            <el-select v-model="form.relation" filterable placeholder="请选择" style="width: 100%;">
                                 <el-option v-for="item in relNameList" :key="item" :label="item" :value="item"></el-option>
                             </el-select>   
                           </el-form-item>
@@ -187,9 +190,10 @@
                       <el-row>
                         <el-col :span="14">
                           <el-form-item label="尾实例名称">
-                            <el-select v-model="form.entityName1" allow-create filterable placeholder="请选择实例名称" style="width: 100%;">
+                            <el-select v-if="form.isChangeSort" v-model="form.entityName1" remote :remote-method="remoteMethodEntityList" allow-create filterable placeholder="请选择实例名称" style="width: 100%;" @change="nowremoteIndex = index">
                                 <el-option v-for="item in form.entityNameListbyRel" :key="item" :label="item" :value="item"></el-option>
-                            </el-select>                      
+                            </el-select>
+                            <span v-else style="color: #FFFF00;">{{ nowlabelEntityName }}</span>                  
                           </el-form-item>
                         </el-col>
                         <el-col :span="2">
@@ -230,7 +234,8 @@
                       <el-row>
                         <el-col :span="14">
                           <el-form-item label="头实例名称">
-                            <div style="color: #FFFF00;">{{ nowlabelEntityName }}</div>
+                            <div v-if="form.isChangeSort" style="color: #FFFF00;">{{ nowlabelEntityName }}</div>
+                            <div v-else style="color: #FFFF00;"> {{ form.entityName1 }}</div>            
                           </el-form-item>
                         </el-col>
                         <el-col :span="2">
@@ -242,7 +247,8 @@
                       <el-row>
                         <el-col :span="14">
                           <el-form-item label="尾实例名称">
-                            <div style="color: #FFFF00;"> {{ form.entityName1 }}</div>            
+                            <div v-if="form.isChangeSort" style="color: #FFFF00;"> {{ form.entityName1 }}</div>
+                            <div v-else style="color: #FFFF00;">{{ nowlabelEntityName }}</div>            
                           </el-form-item>
                         </el-col>
                         <el-col :span="2">
@@ -312,6 +318,7 @@ export default {
         formItems:[],
         propForm:{},
         relforms:[],
+        nowremoteIndex:0,
         isDetail:true,
         passageDetail:{},
         dialogFormVisible:false,
@@ -402,6 +409,7 @@ export default {
         isAbstact:false,
         isqueding:true,
         entityNameListbyRel:[],
+        isChangeSort:true,
       });
     },
     saveForm(index) {
@@ -419,19 +427,19 @@ export default {
         },
         saveTripletReqList:[{
           comment:this.relforms[index].note,
-          isEnsure:2,
           object:this.relforms[index].entityName1,
           objectAmount:this.relforms[index].entity1num,
           predicate:this.relforms[index].relation,
           predicateType:2,
+          isEnsure:0,
+          status:2,
           subjectAmount:this.relforms[index].entity2num,
-          subject:this.relforms[index].nowlabelEntityName,
+          subject:this.nowlabelEntityName,
           tripleText:this.relforms[index].text
           }
         ]
       }
       saveTriplets(params).then(res=>{
-        console.log(res.data)
       })
       this.$set(this.relforms, index, { ...this.relforms[index], editing: false });
     },
@@ -559,16 +567,26 @@ export default {
           // 停止监听鼠标抬起事件
       document.removeEventListener('mouseup', this.handleTextSelection);
     },
-    
-    getEntityByRelationFunction(index){
-      console.log(this.relforms[index])
+    remoteMethodEntityList(query){
       let params = {
-        entityType:this.nowlabelEntityType,
-        relation:this.relforms[index].relation
-      }
-      getEntityByRelation(params).then(res=>{
-        this.$set(this.relforms, index, { ...this.relforms[index], entityNameListbyRel: res.data.entityList });
-      })
+          entityType:this.nowlabelEntityType,
+          relation:this.relforms[this.nowremoteIndex].relation,
+          text: query
+        }
+        if (query !== '') {
+          setTimeout(() => {
+            getEntityByRelation(params).then(res=>{
+              this.$set(this.relforms, this.nowremoteIndex, { ...this.relforms[this.nowremoteIndex], entityNameListbyRel: res.data.entityList });
+              if(res.data.entityLocation == 0){
+                this.$set(this.relforms, this.nowremoteIndex, { ...this.relforms[this.nowremoteIndex], isChangeSort: true });
+              }else{
+                this.$set(this.relforms, this.nowremoteIndex, { ...this.relforms[this.nowremoteIndex], isChangeSort: false });
+              }
+            })
+          }, 200);
+        } else {
+          this.$set(this.relforms, index, { ...this.relforms[index], entityNameListbyRel: [] });;
+        }
     },
     enterProp(item){
       this.isDetail = false
@@ -620,7 +638,10 @@ export default {
                 subject:this.addEntityForm.entityName,
                 object:this.addEntityForm.entityType
               },
-              EquipOrSplitReq:this.passageDetail
+              EquipOrSplitReq:{
+                id:this.passageDetail.id,
+                dataType:this.passageDetail.dataType
+              }
             }
             addInstance(params).then(res => {
               if(res.code == 200){
