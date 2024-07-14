@@ -146,3 +146,32 @@ import request from '@/utils/request'
       data: query,
     })
   }
+  export function getRelationByEntityType(query) {
+    return request({
+      url: '/proofread/getRelation',
+      method: 'post',
+      params: query,
+    })
+  }
+  export function getEntityByRelation(query) {
+    return request({
+      url: '/proofread/getEntityByRelation',
+      method: 'post',
+      params: query,
+    })
+  }
+  export function getRelList(query) {
+    return request({
+      url: '/proofread/getRelationList',
+      method: 'post',
+      data: query,
+    })
+  }
+
+  export function saveTriplets(query) {
+    return request({
+      url: '/proofread/saveTriplets',
+      method: 'post',
+      data: query,
+    })
+  }

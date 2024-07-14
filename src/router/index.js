@@ -103,7 +103,31 @@ export const constantRoutes = [
         component: () => import('@/views/GraphAdmin/entityAdmin'),
         name: 'entityAdmin',
         meta: { title: '实例管理'}
-      }
+      },
+      {
+        path: 'dwAdmin',
+        component: () => import('@/views/GraphAdmin/dwAdmin'),
+        name: 'dwAdmin',
+        meta: { title: '单位管理'}
+      },
+      {
+        path: 'sxAdmin',
+        component: () => import('@/views/GraphAdmin/sxAdmin'),
+        name: 'sxAdmin',
+        meta: { title: '属性管理'}
+      },
+      {
+        path: 'gxAdmin',
+        component: () => import('@/views/GraphAdmin/gxAdmin'),
+        name: 'gxAdmin',
+        meta: { title: '关系管理'}
+      },
+      {
+        path: 'gnAdmin',
+        component: () => import('@/views/GraphAdmin/gnAdmin'),
+        name: 'gnAdmin',
+        meta: { title: '概念管理'}
+      },
     ]
   },
   {

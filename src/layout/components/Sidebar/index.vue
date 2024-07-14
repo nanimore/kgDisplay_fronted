@@ -149,6 +149,13 @@
                     <el-menu-item index="/GraphAdmin/entityAdmin">
                         <span>实例管理</span>
                     </el-menu-item>
+                    <el-submenu index="4-3">
+                        <template slot="title">本体管理</template>
+                        <el-menu-item index="/GraphAdmin/gnAdmin">概念管理</el-menu-item>
+                        <el-menu-item index="/GraphAdmin/sxAdmin">属性管理</el-menu-item>
+                        <el-menu-item index="/GraphAdmin/gxAdmin">关系管理</el-menu-item>
+                        <el-menu-item index="/GraphAdmin/dwAdmin">单位管理</el-menu-item>
+                    </el-submenu>
                 </el-submenu>
                 <el-menu-item index="/user/admin">
                     <i class="el-icon-user"></i>
