@@ -1,23 +1,56 @@
 <template>
     <div class="app-container">
         <el-dialog
-            :title="rowName"
-            :visible.sync="dialogVisible"
-            width="25%"
+            title="编辑概念"
+            :visible.sync="dialogVisibleEditBt"
+            width="30%"
             center
+            :modal="false" 
+            v-draggable
             :close-on-click-modal="false"
             custom-class="viewDialog">
-            <el-descriptions class="margin-top" :column="1" border>
-                <el-descriptions-item v-for="item in otherNameList" :label="item.name">{{ item.value }}</el-descriptions-item>
-            </el-descriptions>
+            <el-form :model="formInline" class="demo-form-inline" ref="formInline" label-width="80px">
+                <el-form-item label="父概念" prop="fatherGn">
+                    <el-select v-model="formInline.fatherGn" style="width: 300px;">
+                    <el-option label="区域一" value="shanghai"></el-option>
+                    <el-option label="区域二" value="beijing"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="概念名称" prop="GnName">
+                    <el-input v-model="formInline.GnName" style="width: 300px;"></el-input>
+                </el-form-item>
+            </el-form>
+            <div style="text-align: center;">
+                <el-button type="primary" @click="submitForm('formInline')">确定</el-button>
+                <el-button @click="resetForm('formInline')">取 消</el-button>
+            </div>
+        </el-dialog>
+        <el-dialog
+            :title="isAddSonName?'添加概念':'添加子概念'"
+            :visible.sync="dialogVisibleEditBtadd"
+            width="30%"
+            center
+            :modal="false" 
+            v-draggable
+            :close-on-click-modal="false"
+            custom-class="viewDialog">
+            <el-form :model="formInline1" class="demo-form-inline" ref="formInline1" label-width="80px">
+                <el-form-item :label="isAddSonName?'概念名称':'子概念名称'" prop="GnName">
+                    <el-input v-model="formInline1.GnName" style="width: 300px;"></el-input>
+                </el-form-item>
+            </el-form>
+            <div style="text-align: center;">
+                <el-button type="primary" @click="submitForm('formInline1')">确定</el-button>
+                <el-button @click="resetForm('formInline1')">取 消</el-button>
+            </div>
         </el-dialog>
         <div style="display: flex;">
             <div class="leftContainer">
                 <div class="entityType">
-                    <i class="el-icon-document-copy" style="margin-left: 15px;"></i>
-                    <i class="el-icon-printer"></i>
-                    <i class="el-icon-edit-outline"></i>
-                    <i class="el-icon-delete"></i>
+                    <i class="el-icon-document-copy" style="margin-left: 15px;" @click="addSonBt()"></i>
+                    <i class="el-icon-printer" @click="addBt()"></i>
+                    <i class="el-icon-edit-outline" @click="editBt()"></i>
+                    <i class="el-icon-delete" @click="deleteBt()"></i>
                 </div>
                 <el-input
                     prefix-icon="el-icon-search"
@@ -32,7 +65,9 @@
                       ref="tree"
                       node-key="id"
                       highlight-current
-                      @check="selectNodes">
+                      @check="selectNodes"
+                      :expand-on-click-node="false"
+                      @node-click="changeNowNode">
                   </el-tree>
                 </div>
             </div>
@@ -60,9 +95,17 @@ export default {
   data() {
     return {
         dialogVisible: false,
+        dialogVisibleEditBt:false,
         queryParams: {
             keyword: '',
             time: ''
+        },
+        formInline:{
+            fatherGn:'',
+            GnName:''
+        },
+        formInline1:{
+            GnName:''
         },
         rowName:'',
         filterText: '',
@@ -72,6 +115,9 @@ export default {
         totalNum:100,
         activeName: 'first',
         otherNameList:[],
+        dialogVisibleEditBtadd:false,
+        nowClickNode:{},
+        isAddSonName:Boolean,
         data: [{
           id: 1,
           label: '一级 1',
@@ -115,12 +161,6 @@ export default {
     }
   },
   methods: {
-    handleSizeChange(pageSize){
-        this.loadData(pageSize,this.currentPage)
-    },
-    handleCurrentChange(currentpage){
-        this.loadData(this.pageSize,currentpage)
-    },
     loadData(pageSize,currentpage){
         let disstartDate ='';
         let disendDate = '';
@@ -151,9 +191,72 @@ export default {
     },
     resetForm(formName) {
         this.$refs[formName].resetFields();
-        this.currentPage = 1
-        this.pageSize = 10
-        this.loadData()
+        this.dialogVisibleEditBt = false
+    },
+    editBt(){
+        if(this.nowClickNode.id){
+            this.dialogVisibleEditBt = true
+        }else{
+            this.$message.error("请选择需要编辑的概念！")
+        }
+    },
+    addBt(){
+        if(this.nowClickNode.id){
+            this.isAddSonName = false
+            this.dialogVisibleEditBtadd = true
+        }else{
+            this.$message.error("请选择需要添加概念的位置！")
+        }
+    },
+    getParentLabels(node) {
+      const labels = [];
+      let parent = node.parent;
+
+      while (parent) {
+        labels.unshift(parent.label);
+        parent = parent.parent;
+      }
+
+      return labels;
+    },
+    addSonBt(){
+        if(this.nowClickNode.id){
+            this.isAddSonName = true
+            this.dialogVisibleEditBtadd = true
+        }else{
+            this.$message.error("请选择需要添加子概念的位置！")
+        }
+    },
+    deleteBt(){
+        console.log(this.nowClickNode)
+        if(this.nowClickNode.id){
+            this.$confirm('是否删除'+this.nowClickNode.label+'？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+            // deleteEntity(deleteEntityParams).then(res=>{
+            //     if(res.code == 200){
+                this.$message({
+                    type: 'success',
+                    message: '删除成功!',
+                });
+            //     this.isDetail = true;
+            //     this.getEntityListFunction()
+            //     }
+            // })
+            });
+        }else{
+            this.$message.error("请选择需要删除的概念！")
+        }
+    },
+    changeNowNode(params1){
+        this.nowClickNode = params1
+        const labels = this.getParentLabels(node);
+        labels.push(node.label);
+        this.breadcrumbLabels = labels;
+        console.log('Current node label:', node.label);
+        console.log('All parent labels:', labels);
     },
     viewOtherName(data){
         this.dialogVisible = true;
@@ -270,12 +373,19 @@ export default {
         border: 1px solid rgba(2,125,180,1);
     }
     ::v-deep .el-tree-node__content{
-        background: url('../../assets/images/u376.svg') no-repeat;
-        
+        background: url('../../assets/images/u376.svg') no-repeat;      
     }
     ::v-deep .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content{
         background: url('../../assets/images/u376.svg') no-repeat;
         color: #169BD5;
+    }
+    ::v-deep .el-tree-node__content{
+        .is-focusable{
+            background: url('../../assets/images/u376.svg') no-repeat;      
+        }
+    }
+    ::v-deep .el-tree-node:focus > .el-tree-node__content{
+        background: url('../../assets/images/u376.svg') no-repeat;    
     }
     ::v-deep .el-tree-node__content:hover{
         background: url('../../assets/images/u376.svg') no-repeat !important;

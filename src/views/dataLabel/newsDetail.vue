@@ -417,6 +417,10 @@ export default {
       // axios.post('/api/forms', form).then(() => {
       //   this.$set(this.forms, index, { ...form, editing: false });
       // });
+      if(this.relforms[index].entityName1==''||this.relforms[index].relation==''||this.relforms[index].text==''){
+        this.$message.error("关系名称、尾实例名称、文本不能为空！")
+        return false
+      }
       let params ={
         docInfoReq:{
           docId:this.params.articleId,
