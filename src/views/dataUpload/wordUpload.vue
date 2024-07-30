@@ -417,8 +417,7 @@ export default {
         }  
     },  
     handleSelectionChange(val) {
-        this.multipleSelection = val;
-        
+        this.multipleSelection = val;   
     },
     resetQuery(){
         this.resetForm("queryParams")

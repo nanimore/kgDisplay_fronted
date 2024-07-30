@@ -102,7 +102,13 @@ export const constantRoutes = [
         path: 'entityAdmin',
         component: () => import('@/views/GraphAdmin/entityAdmin'),
         name: 'entityAdmin',
-        meta: { title: '实例管理'}
+        meta: { title: '实例管理'},
+      },
+      {
+        path: 'entityAdminDataList',
+        component: () => import('@/views/GraphAdmin/entityAdminDataList'),
+        name: 'entityAdminDataList',
+        meta: { title: '实例管理详情页'}
       },
       {
         path: 'dwAdmin',
@@ -210,9 +216,9 @@ export const constantRoutes = [
     children: [
       {
         path: 'networkwideEnd',
-        component: () => import('@/views/dataUpload/bookUpload'),
+        component: () => import('@/views/dataReview/networkwideEnd'),
         name: 'networkwideEnd',
-        meta: { title: '书籍上传'}
+        meta: { title: '全网端数据'}
       }
     ]
   }

@@ -8,7 +8,7 @@
             :close-on-click-modal="false"
             custom-class="viewDialog">
             <el-descriptions class="margin-top" :column="1" border>
-                <el-descriptions-item v-for="item in otherNameList" :label="item.name">{{ item.value }}</el-descriptions-item>
+                <el-descriptions-item v-for="item in otherNameList" :label="item.name" :key="item.index">{{ item.value }}</el-descriptions-item>
             </el-descriptions>
         </el-dialog>
         <div style="display: flex;">

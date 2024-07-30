@@ -1,58 +1,11 @@
 <template>
     <div class="app-container">
-        <el-dialog title="领取数据" :visible.sync="dialogFormVisible" center :close-on-click-modal="false"  width="35%" custom-class="my-dialog">
-            <el-form :model="form" ref="form" :rules="rules" :label-position="labelPosition"  label-width="140px">
-                <el-form-item label="数据源类型" prop="docType">
-                    <el-select v-model="form.docType" placeholder="请选择" filterable >
-                        <el-option v-for="item in initDocTypeList" :label="item" :value="item" :key="item"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="数据类型" prop="dataType">
-                    <el-select v-model="form.dataType" placeholder="请选择"  filterable>
-                        <el-option
-                            v-for="group in initDocCategory"
-                            :key="group.index"
-                            v-if="group.children==null"
-                            :label="group.name"
-                            :value="group.name"
-                        ></el-option>
-                        <el-option-group
-                            v-for="group in initDocCategory"
-                            :key="group.name"
-                            v-if="group.children"
-                            :label="group.name"
-                        >
-                            <el-option
-                            v-for="item in group.children"
-                            :key="item"
-                            :label="item"
-                            :value="item"
-                            ></el-option>
-                        </el-option-group>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="任务数量" prop="quantity" style="margin-bottom: 0;">
-                    <el-input v-model="form.quantity" placeholder="请输入任务数量1-100"></el-input>
-                </el-form-item>
-            </el-form>
-            <div slot="footer" class="dialog-footer" style="text-align: center;">
-                <el-button type="primary" @click="submitForm('form')">立即提交</el-button>
-            </div>
-        </el-dialog>
         <el-form :model="queryParams" ref="queryParams" :inline="true">
-
-            <el-form-item>
-                <el-button type="primary" @click="dialogFormVisible = true">领取数据</el-button>
-            </el-form-item>
             <el-form-item label="状态" style="margin-left: 10px;" prop="docStatus">
                 <el-radio-group v-model="queryParams.docStatus" fill="#008080" @input="onselectChange()">
-                    <el-radio-button label="1" >未标注</el-radio-button>
-                    <el-radio-button label="2" >已标注</el-radio-button>
-                    <el-radio-button label="3" >未通过</el-radio-button>
-                    <el-radio-button label="4" >已通过</el-radio-button>
-                    <el-radio-button label="5" >已返工</el-radio-button>
-                    <el-radio-button label="6" >待审核</el-radio-button>
-                    <el-radio-button label="7" >待补充</el-radio-button>
+                    <el-radio-button label="1" >已通过</el-radio-button>
+                    <el-radio-button label="2" >待审核</el-radio-button>
+                    <el-radio-button label="3" >FJS</el-radio-button>
                 </el-radio-group>
             </el-form-item>
             <div class="break-line-div"></div>

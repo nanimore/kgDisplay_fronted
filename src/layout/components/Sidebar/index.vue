@@ -135,7 +135,7 @@
                             <el-menu-item index="4-3-5-3">机场</el-menu-item>
                         </el-submenu>
                     </el-submenu>
-                    <el-menu-item index="4-4">
+                    <el-menu-item index="/dataReview/networkwideEnd">
                         <template slot="title">
                             <span>全网端数据</span>
                         </template>

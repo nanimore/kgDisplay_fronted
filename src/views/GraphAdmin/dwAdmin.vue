@@ -8,7 +8,7 @@
             :close-on-click-modal="false"
             custom-class="viewDialog">
             <el-descriptions class="margin-top" :column="1" border>
-                <el-descriptions-item v-for="item in otherNameList" :label="item.name">{{ item.value }}</el-descriptions-item>
+                <el-descriptions-item v-for="item in otherNameList" :label="item.name" :key="item.index">{{ item.value }}</el-descriptions-item>
             </el-descriptions>
         </el-dialog>
         <div style="display: flex;">
@@ -279,13 +279,16 @@ export default {
     ::v-deep .el-tree-node__content:hover{
         background: url('../../assets/images/u376.svg') no-repeat !important;
     }
-    ::v-deep .el-tabs{
-        .is-active{
-            color: white;
-            background-color: #169BD5 !important;
-            padding: 0 !important;
-        }
+    ::v-deep .el-tabs__header{
+        .el-tabs{
+            .is-active{
+                color: white;
+                background-color: #169BD5 !important;
+                padding: 0 !important;
+            }
     }
+    } 
+
     ::v-deep .el-tabs{
         .el-tabs__header{
             margin-bottom: 0;

@@ -77,7 +77,7 @@
           </el-form-item>
           <el-form-item label="丢弃人" prop="proofreader1" v-if="!isDropData">
             <el-select v-model="queryParams.proofreader1" placeholder="请选择" style="width: 150px;">
-                <el-option v-for="item in userList" :label="item" :value="item"></el-option>
+                <el-option v-for="item in userList" :label="item" :value="item" :key="item.index"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -86,7 +86,7 @@
           </el-form-item>
           <el-form-item label="标注人" prop="proofreader">
             <el-select v-model="queryParams.proofreader" placeholder="请选择" style="width: 150px;">
-                <el-option v-for="item in userList" :label="item" :value="item"></el-option>
+                <el-option v-for="item in userList" :label="item" :value="item" :key="item.index"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item>
@@ -331,9 +331,11 @@ export default {
         sessionStorage.setItem('searchCriteria', JSON.stringify(this.queryParams));
     },
     handleSizeChange(pageSize){
+        this.pageSize = pageSize
         this.handleQuery(pageSize,this.currentPage)
     },
     handleCurrentChange(currentpage){
+        this.currentPage = currentpage
         this.handleQuery(this.pageSize,currentpage)
     },
     onselectChange(){

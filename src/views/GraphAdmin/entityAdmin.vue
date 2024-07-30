@@ -8,7 +8,7 @@
             :close-on-click-modal="false"
             custom-class="viewDialog">
             <el-descriptions class="margin-top" :column="1" border>
-                <el-descriptions-item v-for="item in otherNameList" :label="item.name">{{ item.value }}</el-descriptions-item>
+                <el-descriptions-item v-for="item in otherNameList" :label="item.name" :key="item.index">{{ item.value }}</el-descriptions-item>
             </el-descriptions>
         </el-dialog>
         
@@ -224,9 +224,11 @@ export default {
   },
   methods: {
     handleSizeChange(pageSize){
+        this.pageSize = pageSize
         this.loadData(pageSize,this.currentPage)
     },
     handleCurrentChange(currentpage){
+        this.currentPage = currentpage
         this.loadData(this.pageSize,currentpage)
     },
     loadData(pageSize,currentpage){
