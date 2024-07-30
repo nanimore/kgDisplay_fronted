@@ -116,8 +116,8 @@
               <img src='../../assets/images/u1890.svg' @click="backToEntityList()" style="width:20px;height: 20px;cursor: pointer;"></img>
             </span>
           </div>
-          <el-tabs class="entityDetailInnerContent" style="margin-top: 10px;color: #02A7F0;">
-            <el-tab-pane label="实例属性">
+          <el-tabs class="entityDetailInnerContent" v-model="activeName" style="margin-top: 10px;color: #02A7F0;">
+            <el-tab-pane label="实例属性" name="first">
               <div class="addSelfProp" @click="addSelfProp()" ><img src="../../assets/images/u1895.svg" style="width: 15px;height: 15px;margin-right: 8px;"></img><span style="cursor: pointer;">自定义属性</span></div>
               <div v-if="formVisible">
                 <el-form :model="selfDefinePropForm" class="selfDefinePropForm" label-width="60px">
@@ -148,7 +148,7 @@
                 </el-form-item>  
               </el-form> 
             </el-tab-pane>
-            <el-tab-pane label="实例关系">
+            <el-tab-pane label="实例关系" name="second">
               <div class="addRelClass">
                 <span class="addRelClassContainer" @click="addEntity('addEntityForm')"><img src="../../assets/images/u3832.svg" class="addClass">添加实例</span>
                 <span class="addRelClassContainer" @click="addrelForm()" style="margin-left: 20px;"><img src="../../assets/images/u3832.svg" class="addClass">添加关系</span>
@@ -190,7 +190,7 @@
                       <el-row>
                         <el-col :span="14">
                           <el-form-item label="尾实例名称">
-                            <el-select v-if="form.isChangeSort" v-model="form.entityName1" remote :remote-method="remoteMethodEntityList" allow-create filterable placeholder="请选择实例名称" style="width: 100%;" @change="nowremoteIndex = index">
+                            <el-select v-if="form.isChangeSort" v-model="form.entityName1" remote :remote-method="remoteMethodEntityList" allow-create filterable placeholder="请选择实例名称" style="width: 100%;" @focus="nowremoteIndex = index">
                                 <el-option v-for="item in form.entityNameListbyRel" :key="item" :label="item" :value="item"></el-option>
                             </el-select>
                             <span v-else style="color: #FFFF00;">{{ nowlabelEntityName }}</span>                  
@@ -222,7 +222,7 @@
                             <span v-if="form.editing" style="color: red;cursor: pointer;margin-left: 15px;" @click="clearRelform(index)">清除</span>
                             <el-button type="primary" style="background-color: #03afb0;margin-right: 10px;margin-left: 15px;" @click="editrelForm(index)" v-if="!form.editing">编辑</el-button>
                             <el-button type="primary" style="background-color: #03afb0;margin-right: 10px;margin-left: 15px;" @click="saveForm(index)" v-if="form.editing">暂存</el-button>
-                            <el-button type="primary" style="background-color: #aaaaaa;margin-right: 10px;margin-left: 15px;" @click="form.editing = !form.editing" v-if="form.editing">取消</el-button>
+                            <el-button type="primary" style="background-color: #aaaaaa;margin-right: 10px;margin-left: 15px;" @click="getRelListFunction(nowEditEntityId)" v-if="form.editing">取消</el-button>
                             <el-button type="danger" style="margin-right: 10px;margin-left: 15px;"  v-if="!form.editing">删除</el-button>
                           </div>
                         </el-col>
@@ -246,6 +246,13 @@
                       </el-row>
                       <el-row>
                         <el-col :span="14">
+                          <el-form-item label="关系名称">
+                            <div style="color: #FFFF00;"> {{ form.relation }}</div>            
+                          </el-form-item>
+                        </el-col>
+                      </el-row>
+                      <el-row>
+                        <el-col :span="14">
                           <el-form-item label="尾实例名称">
                             <div v-if="form.isChangeSort" style="color: #FFFF00;"> {{ form.entityName1 }}</div>
                             <div v-else style="color: #FFFF00;">{{ nowlabelEntityName }}</div>            
@@ -259,24 +266,17 @@
                       </el-row>
                       <el-row>
                         <el-col :span="14">
-                          <el-form-item label="关系名称">
-                            <div style="color: #FFFF00;"> {{ form.relation }}</div>            
-                          </el-form-item>
-                        </el-col>
-                      </el-row>
-                      <el-row>
-                        <el-col :span="14">
                           <el-form-item label="文本" class="teshu">
                             <div style="color: #FFFF00;"> {{ form.text }}</div>            
                           </el-form-item>
                         </el-col>
                         <el-col :span="10">
                           <div>
-                            <span v-if="form.isAbstact&&form.isqueding" style="color: red;cursor: pointer;margin-left: 15px;">确定</span>
-                            <span v-if="form.isAbstact&&!form.isqueding" style="color: red;cursor: pointer;margin-left: 15px;">取消</span>
+                            <span v-if="form.isAbstact&&form.isqueding == 0" style="color: red;cursor: pointer;margin-left: 15px;">确定</span>
+                            <span v-if="form.isAbstact&&form.isqueding == 1" style="color: red;cursor: pointer;margin-left: 15px;">取消</span>
                             <el-button type="primary" style="background-color: #03afb0;margin-right: 10px;margin-left: 15px;" @click="editrelForm(index)" v-if="!form.editing">编辑</el-button>
                             <el-button type="primary" style="background-color: #03afb0;margin-right: 10px;margin-left: 15px;" @click="saveForm(index)" v-if="form.editing">暂存</el-button>
-                            <el-button type="primary" style="background-color: #aaaaaa;margin-right: 10px;margin-left: 15px;" @click="form.editing = !form.editing" v-if="form.editing">取消</el-button>
+                            <el-button type="primary" style="background-color: #aaaaaa;margin-right: 10px;margin-left: 15px;" @click="getRelListFunction(nowEditEntityId)" v-if="form.editing">取消</el-button>
                             <el-button type="danger" style="margin-right: 10px;margin-left: 15px;"  v-if="!form.editing">删除</el-button>
                           </div>
                         </el-col>
@@ -332,13 +332,9 @@ export default {
         },
         nowEditEntityId:'',
         relform: {}, // 用于存储表单数据的对象  
-        RelformItems: [ // 假设这是从接口获取的表单结构  
-          { label: '用户名', prop: 'username', isEditing: false },  
-          { label: '密码', prop: 'password', isEditing: false },  
-          // ... 其他字段  
-        ],  
         entityNameList:[],
         entityTypeList:[],
+        activeName: 'first',
         formVisible:false,
         isEditEntityName1:true,
         searchQuery: '',
@@ -407,7 +403,7 @@ export default {
         entity1num:0,
         isSelfDefinedRel:false,
         isAbstact:false,
-        isqueding:true,
+        isqueding:0,
         entityNameListbyRel:[],
         isChangeSort:true,
       });
@@ -436,7 +432,6 @@ export default {
           predicate:this.relforms[index].relation,
           predicateType:2,
           isEnsure:0,
-          status:2,
           subjectAmount:this.relforms[index].entity2num,
           subject:this.nowlabelEntityName,
           tripleText:this.relforms[index].text
@@ -444,8 +439,10 @@ export default {
         ]
       }
       saveTriplets(params).then(res=>{
+        if(res.code == 200){
+          this.getRelListFunction()
+        }
       })
-      this.$set(this.relforms, index, { ...this.relforms[index], editing: false });
     },
     editrelForm(index) {
       this.$set(this.relforms, index, { ...this.relforms[index], editing: true });
@@ -572,14 +569,15 @@ export default {
       document.removeEventListener('mouseup', this.handleTextSelection);
     },
     remoteMethodEntityList(query){
+      console.log(this.nowremoteIndex)
       let params = {
           entityType:this.nowlabelEntityType,
           relation:this.relforms[this.nowremoteIndex].relation,
           text: query
         }
         if (query !== '') {
-          setTimeout(() => {
             getEntityByRelation(params).then(res=>{
+              console.log(res.data)
               this.$set(this.relforms, this.nowremoteIndex, { ...this.relforms[this.nowremoteIndex], entityNameListbyRel: res.data.entityList });
               if(res.data.entityLocation == 0){
                 this.$set(this.relforms, this.nowremoteIndex, { ...this.relforms[this.nowremoteIndex], isChangeSort: true });
@@ -587,9 +585,8 @@ export default {
                 this.$set(this.relforms, this.nowremoteIndex, { ...this.relforms[this.nowremoteIndex], isChangeSort: false });
               }
             })
-          }, 200);
         } else {
-          this.$set(this.relforms, index, { ...this.relforms[index], entityNameListbyRel: [] });;
+          this.$set(this.relforms, this.nowremoteIndex, { ...this.relforms[this.nowremoteIndex], entityNameListbyRel: [] });;
         }
     },
     enterProp(item){
@@ -601,6 +598,17 @@ export default {
       this.getPropListFunction(item.uuid)
       this.getRelListFunction(item.uuid)
       this.nowEditEntityId = item.uuid
+    },
+    enterRel(item){
+      this.isDetail = false
+      this.nowlabelEntityName = item.entityName
+      this.nowlabelEntityType = item.entityType
+      this.getEntityNameByEntityTypeFunction()
+      this.getRelationByEntityTypeFunction()
+      this.getPropListFunction(item.uuid)
+      this.getRelListFunction(item.uuid)
+      this.nowEditEntityId = item.uuid
+      this.activeName = 'second'
     },
     getRelationByEntityTypeFunction(){
       let params = {
@@ -618,8 +626,27 @@ export default {
         uuid:id,
         dataType:this.nowlabelEntityType
       }
+      let dataList = []
       getRelList(params).then(res=>{
-        console.log(res.data)
+        dataList = res.data
+          this.relforms = []
+          dataList.forEach(item => {
+            this.relforms.push({
+              id: item.id,
+              entityName1: item.object,
+              relation: item.relationName,
+              text:item.tripleText,
+              note:item.remark,
+              editing: false,
+              entity2num:item.objectAmount,
+              entity1num:item.subjectAmount,
+              isSelfDefinedRel:item.isCustomRel,
+              isAbstact:item.isExtract,
+              isqueding:item.isEnsure,
+              entityNameListbyRel:[],
+              isChangeSort:true,
+          });
+        });
       })
     },
     getPropListFunction(id){
@@ -644,7 +671,7 @@ export default {
               },
               EquipOrSplitReq:{
                 id:this.passageDetail.id,
-                dataType:this.passageDetail.dataType
+                docType:this.passageDetail.docType
               }
             }
             addInstance(params).then(res => {

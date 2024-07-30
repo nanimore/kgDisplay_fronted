@@ -139,7 +139,7 @@
                         label="操作"
                         align="center">
                         <template slot-scope="scope">
-                            <el-button type="primary" size="small" @click="sendSalary(scope.row)">详情</el-button>
+                            <el-button type="primary" size="small" @click="goEntityDetail(scope.row)">详情</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -294,6 +294,10 @@ export default {
       // 取消选中节点
       this.$refs.tree.setChecked(node.id, false);
       this.selectedLeafNodes = this.selectedLeafNodes.filter(item => item.id !== node.id);
+    },
+    goEntityDetail(data){
+        let params = data
+        this.$router.push({name:'entityAdminDataList',params:{params}});
     },
     formatDate(date) {
       const d = new Date(date);

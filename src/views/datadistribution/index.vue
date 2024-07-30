@@ -148,7 +148,6 @@ export default {
     getInitProofreaders().then(res=>{
         this.userList = res.data
     })
-
   },
   mounted(){
     console.log(this.params)

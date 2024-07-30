@@ -1,19 +1,55 @@
 <template>
     <div class="app-container">
         <el-form :model="queryParams" ref="queryParams" :inline="true">
-            <el-form-item label="状态" style="margin-left: 10px;" prop="docStatus">
+            <el-form-item label="状态" style="margin-left: 10px" prop="docStatus">
                 <el-radio-group v-model="queryParams.docStatus" fill="#008080" @input="onselectChange()">
-                    <el-radio-button label="1" >已通过</el-radio-button>
-                    <el-radio-button label="2" >待审核</el-radio-button>
-                    <el-radio-button label="3" >FJS</el-radio-button>
+                    <el-radio-button label="4" >已通过</el-radio-button>
+                    <el-radio-button label="6" >待审核</el-radio-button>
+                    <el-radio-button label="8" >FJS</el-radio-button>
                 </el-radio-group>
+            </el-form-item>
+            <el-form-item style="float: right;">
+                <span class="newsTitleContentright">
+                    <img src='../../assets/images/u1890.svg' @click="back()" style="width: 30px;height: 30px;float: right;cursor: pointer;"></img>
+                </span>
+            </el-form-item>
+            <div class="break-line-div"></div>
+            <el-form-item label="采集时间" prop="createTime">
+                <el-date-picker
+                    v-model="queryParams.createTime"
+                    type="datetimerange"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    style="width: 250px;">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="标注时间" prop="distributiontime">
+                <el-date-picker
+                    v-model="queryParams.distributiontime"
+                    type="datetimerange"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    style="width: 250px;">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="标注人员" prop="proofreader">
+                <el-select v-model="queryParams.proofreader" placeholder="请选择" style="width: 150px;">
+                    <el-option v-for="item in peopleList" :label="item" :value="item" :key="item"></el-option>
+                </el-select>
             </el-form-item>
             <div class="break-line-div"></div>
             <el-form-item label="数据源类型" prop="docType">
-                <el-select v-model="queryParams.docType" placeholder="请选择" style="width: 150px;">
+                <el-select v-model="queryParams.docType" placeholder="请选择" style="width: 150px;" @change="handleDataSourceTypeChange()">
                     <el-option v-for="item in initDocTypeList" :label="item" :value="item" :key="item"></el-option>
                 </el-select>
             </el-form-item>
+            <el-form-item label="数据源名称" prop="datasourceName">
+              <el-select v-model="queryParams.datasourceName" placeholder="请选择" style="width: 150px;">
+                  <el-option v-for="item in initDocNameList" :label="item" :value="item" :key="item"></el-option>
+              </el-select>
+          </el-form-item>
             <el-form-item label="文章类别" prop="dataType">
                 <el-select v-model="queryParams.dataType" placeholder="请选择" style="width: 150px;">
                     <el-option
@@ -38,37 +74,7 @@
                     </el-option-group>
                 </el-select>
             </el-form-item>
-            <el-form-item label="采集时间" prop="createTime">
-                <el-date-picker
-                    v-model="queryParams.createTime"
-                    type="datetimerange"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    style="width: 250px;">
-                </el-date-picker>
-            </el-form-item>
-            <el-form-item label="分配时间" prop="distributiontime">
-                <el-date-picker
-                    v-model="queryParams.distributiontime"
-                    type="datetimerange"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    style="width: 250px;">
-                </el-date-picker>
-            </el-form-item>
-            <el-form-item label="发布时间" prop="publishtime">
-                <el-date-picker
-                    v-model="queryParams.publishtime"
-                    type="datetimerange"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    style="width: 250px;">
-                </el-date-picker>
-            </el-form-item>
-            <el-form-item label="关键字" prop="keyword">
+            <el-form-item label="实例名称关键字" prop="keyword">
                 <el-input v-model="queryParams.keyword" placeholder="请输入实例名称"/>
             </el-form-item>
             <el-form-item>
@@ -109,10 +115,12 @@
 </template>
   
 <script>
-import { labelNewsList,getinitDocType,getInitDocCategory,pullData } from "@/api/datalabel/label";
+import { labelNewsList,getinitDocType,getInitDocCategory,pullData,getInitProofreaders,getInitDatasourceName } from "@/api/datalabel/label";
 export default {
+  props:['params'],
   name: "dataLabel",
   created(){
+    console.log(this.params)
     let params ={
         pageStatus:this.pageStatus
     }
@@ -122,6 +130,10 @@ export default {
     getInitDocCategory(params).then(res=>{
         this.initDocCategory = res.data
     })
+    getInitProofreaders().then(res=>{
+        this.peopleList = res.data
+    })
+    this.queryParams.keyword  = this.params.entityName
     // if(Cookies.get("newListParams")){
     //     let keyword = Cookies.get("newListParams")
     //     this.queryParams = JSON.parse(keyword)
@@ -140,11 +152,13 @@ export default {
         initDocTypeList:[],
         pageStatus:1,
         initDocCategory:[],
+        initDocNameList:[],
         form:{
             docType:'',
             quantity:'',
             dataType:''
         },
+        peopleList:[],
         rules: {
           docType: [
             { required: true, message: '请选择数据源类型'},
@@ -161,8 +175,9 @@ export default {
             distributiontime:[],
             dataType:'',
             docType:'',
+            proofreader:'',
             publishtime:[],
-            docStatus:1,
+            docStatus:4,
             createTime:[]
         },
         labelPosition:'right',
@@ -176,31 +191,19 @@ export default {
   methods: {
     getStatusClass(status) {
       return {
-        'status-1': status === 1,
-        'status-2': status === 2,
-        'status-3': status === 3,
         'status-4': status === 4,
-        'status-5': status === 5,
         'status-6': status === 6,
-        'status-7': status === 7,
+        'status-3': status === 8,
       };
     },
     getStatusText(status) {
       switch (status) {
-        case 1:
-          return '未标注';
-        case 2:
-          return '已标注';
-        case 3:
-          return '未通过';
         case 4:
           return '已通过';
-        case 5:
-          return '已返工';
         case 6:
           return '待审核';
-        case 7:
-          return '待补充';
+        case 8:
+          return 'FJS';
         default:
           return '';
       }
@@ -209,6 +212,14 @@ export default {
         let params = item
         this.$router.push({name:'newsDetail',params:{params}});
         // Cookies.set('newListParams',JSON.stringify(this.queryParams))
+    },
+    handleDataSourceTypeChange(){
+        let params = {
+            docType:this.queryParams.docType
+        }
+        getInitDatasourceName(params).then(res=>{
+            this.initDocNameList = res.data
+        })
     },
     resetQuery(){
         this.resetForm("queryParams")
@@ -284,6 +295,9 @@ export default {
     handleSizeChange(pageSize){
         this.pageSize = pageSize
         this.handleQuery(pageSize,this.currentPage)
+    },
+    back(){
+        this.$router.push({name:'entityAdmin'})
     },
     handleCurrentChange(currentpage){
         this.currentPage = currentpage

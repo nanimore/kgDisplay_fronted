@@ -108,7 +108,8 @@ export const constantRoutes = [
         path: 'entityAdminDataList',
         component: () => import('@/views/GraphAdmin/entityAdminDataList'),
         name: 'entityAdminDataList',
-        meta: { title: '实例管理详情页'}
+        meta: { title: '实例管理详情页'},
+        props: true
       },
       {
         path: 'dwAdmin',
