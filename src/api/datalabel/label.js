@@ -175,3 +175,10 @@ import request from '@/utils/request'
       data: query,
     })
   }
+  export function saveAllRelations(query) {
+    return request({
+      url: '/proofread/saveAllRelations',
+      method: 'post',
+      data: query,
+    })
+  }

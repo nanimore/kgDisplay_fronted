@@ -149,11 +149,12 @@
               </el-form> 
             </el-tab-pane>
             <el-tab-pane label="实例关系" name="second">
+              <div style="height: 65vh;overflow-y: auto;">
               <div class="addRelClass">
                 <span class="addRelClassContainer" @click="addEntity('addEntityForm')"><img src="../../assets/images/u3832.svg" class="addClass">添加实例</span>
                 <span class="addRelClassContainer" @click="addrelForm()" style="margin-left: 20px;"><img src="../../assets/images/u3832.svg" class="addClass">添加关系</span>
               </div>
-              <div v-for="(form, index) in relforms" :key="form.id" style="border-bottom: 1px solid #aaaaaa;">
+                <div v-for="(form, index) in relforms" :key="form.id" style="border-bottom: 1px solid #aaaaaa;">
                   <div v-if="form.editing">
                     <el-form :model="form" label-width="90px" ref="form" class="relform">
                       <el-row>
@@ -203,12 +204,15 @@
                         </el-col>
                       </el-row>
                       <el-row>
-                        <el-col :span="14">
-                          <el-form-item label="备注" class="teshu">
-                            <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="startSelectingRelNote(index)">
-                            <el-input v-model="form.note" style="width: 90%;"></el-input>
-                          </el-form-item>
-                        </el-col>
+                          <el-col :span="14">
+                            <el-form-item label="备注" class="teshu">
+                              <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="startSelectingRelNote(index)">
+                              <el-input v-model="form.note" style="width: 90%;"></el-input>
+                            </el-form-item>
+                          </el-col>
+                          <el-col :span="6">
+                            <span v-if="form.editing" style="color: yellow;cursor: pointer;margin-left: 15px;" @click="resetRelform(index)">还原</span>
+                          </el-col>
                       </el-row>
                       <el-row>
                         <el-col :span="14">
@@ -223,66 +227,69 @@
                             <el-button type="primary" style="background-color: #03afb0;margin-right: 10px;margin-left: 15px;" @click="editrelForm(index)" v-if="!form.editing">编辑</el-button>
                             <el-button type="primary" style="background-color: #03afb0;margin-right: 10px;margin-left: 15px;" @click="saveForm(index)" v-if="form.editing">暂存</el-button>
                             <el-button type="primary" style="background-color: #aaaaaa;margin-right: 10px;margin-left: 15px;" @click="getRelListFunction(nowEditEntityId)" v-if="form.editing">取消</el-button>
-                            <el-button type="danger" style="margin-right: 10px;margin-left: 15px;"  v-if="!form.editing">删除</el-button>
                           </div>
                         </el-col>
                       </el-row>
                     </el-form>
                   </div>
                   <div v-else>
-                    <el-form :model="form">
+                    <el-form :model="form" label-width="90px">
                       <el-row>
                         <el-col :span="14">
                           <el-form-item label="头实例名称">
-                            <div v-if="form.isChangeSort" style="color: #FFFF00;">{{ nowlabelEntityName }}</div>
-                            <div v-else style="color: #FFFF00;"> {{ form.entityName1 }}</div>            
+                            <div v-if="form.isChangeSort" :class="getStatusClass1(index)">{{ nowlabelEntityName }}</div>
+                            <div v-else :class="getStatusClass1(index)"> {{ form.entityName1 }}</div>            
                           </el-form-item>
                         </el-col>
                         <el-col :span="2">
                           <el-form-item label="数量">
-                            <div style="color: #FFFF00;"> {{ form.entity1num }}</div>            
+                            <div :class="getStatusClass1(index)"> {{ form.entity1num }}</div>            
                           </el-form-item>
                         </el-col>
                       </el-row>
                       <el-row>
                         <el-col :span="14">
                           <el-form-item label="关系名称">
-                            <div style="color: #FFFF00;"> {{ form.relation }}</div>            
+                            <div :class="getStatusClass1(index)"> {{ form.relation }}</div>            
                           </el-form-item>
                         </el-col>
                       </el-row>
                       <el-row>
                         <el-col :span="14">
                           <el-form-item label="尾实例名称">
-                            <div v-if="form.isChangeSort" style="color: #FFFF00;"> {{ form.entityName1 }}</div>
-                            <div v-else style="color: #FFFF00;">{{ nowlabelEntityName }}</div>            
+                            <div v-if="form.isChangeSort" :class="getStatusClass1(index)"> {{ form.entityName1 }}</div>
+                            <div v-else :class="getStatusClass1(index)">{{ nowlabelEntityName }}</div>            
                           </el-form-item>
                         </el-col>
                         <el-col :span="2">
                           <el-form-item label="数量">
-                            <div style="color: #FFFF00;"> {{ form.entity2num }}</div>            
+                            <div :class="getStatusClass1(index)"> {{ form.entity2num }}</div>            
                           </el-form-item>
                         </el-col>
                       </el-row>
                       <el-row>
                         <el-col :span="14">
                           <el-form-item label="文本" class="teshu">
-                            <div style="color: #FFFF00;"> {{ form.text }}</div>            
+                            <div :class="getStatusClass1(index)"> {{ form.text }}</div>            
                           </el-form-item>
                         </el-col>
                         <el-col :span="10">
                           <div>
-                            <span v-if="form.isAbstact&&form.isqueding == 0" style="color: red;cursor: pointer;margin-left: 15px;">确定</span>
-                            <span v-if="form.isAbstact&&form.isqueding == 1" style="color: red;cursor: pointer;margin-left: 15px;">取消</span>
+                            <span v-if="form.isAbstact&&form.isqueding == 0" style="color: yellow;cursor: pointer;margin-left: 15px;" @click="quedingFunction(index)">确定</span>
+                            <span v-if="form.isAbstact&&form.isqueding == 2" style="color: red;cursor: pointer;margin-left: 15px;" @click="cancelFunction(index)">取消</span>
                             <el-button type="primary" style="background-color: #03afb0;margin-right: 10px;margin-left: 15px;" @click="editrelForm(index)" v-if="!form.editing">编辑</el-button>
                             <el-button type="primary" style="background-color: #03afb0;margin-right: 10px;margin-left: 15px;" @click="saveForm(index)" v-if="form.editing">暂存</el-button>
                             <el-button type="primary" style="background-color: #aaaaaa;margin-right: 10px;margin-left: 15px;" @click="getRelListFunction(nowEditEntityId)" v-if="form.editing">取消</el-button>
-                            <el-button type="danger" style="margin-right: 10px;margin-left: 15px;"  v-if="!form.editing">删除</el-button>
+                            <el-button type="danger" style="margin-right: 10px;margin-left: 15px;" @click="deleteEntityRel(index)">删除</el-button>
                           </div>
                         </el-col>
                       </el-row>
                     </el-form>
                   </div>
+                </div>
+              </div>
+              <div style="text-align: center;padding: 10px 0;padding-bottom: 0;">
+                <el-button type="primary" size="mini" style="background-color: #00BFBF;" @click="saveAllRelation()">保存全部关系</el-button>
               </div>
             </el-tab-pane>
           </el-tabs>
@@ -292,7 +299,7 @@
 </template>
 
 <script>
-import { annotationFistPage,getEntityList,getRelList,discard,saveTriplets,getEntityNameByEntityType,deleteEntity,getPropList,chineseAnnotation,getAllLeafEntityTypes,similarInstanceNames,addInstance,getRelationByEntityType,getEntityByRelation } from "@/api/datalabel/label";
+import { annotationFistPage,getEntityList,getRelList,discard,saveTriplets,saveAllRelations,getEntityNameByEntityType,deleteEntity,getPropList,chineseAnnotation,getAllLeafEntityTypes,similarInstanceNames,addInstance,getRelationByEntityType,getEntityByRelation } from "@/api/datalabel/label";
 import { getAllEntityType } from "@/api/index";
 export default {
   props:['params'],
@@ -325,6 +332,7 @@ export default {
         selfdefine:false,
         addEntityTypeList:[],
         relNameList:[],
+        relFormTemp:[],
         addEntityForm:{
           entityType:'',
           entityName:'',
@@ -393,7 +401,6 @@ export default {
     },
     addrelForm() {
       this.relforms.push({
-        id: Date.now(),
         entityName1: '',
         relation: '',
         text:'',
@@ -417,6 +424,12 @@ export default {
         this.$message.error("关系名称、尾实例名称、文本不能为空！")
         return false
       }
+      let idTemp
+      if(this.relforms[index].id){
+        idTemp = this.relforms[index].id
+      }else{
+        idTemp = ''
+      }
       let params ={
         docInfoReq:{
           docId:this.params.articleId,
@@ -426,12 +439,13 @@ export default {
           dataType:this.nowlabelEntityType
         },
         saveTripletReqList:[{
+          id:idTemp,
           comment:this.relforms[index].note,
           object:this.relforms[index].entityName1,
           objectAmount:this.relforms[index].entity1num,
           predicate:this.relforms[index].relation,
           predicateType:2,
-          isEnsure:0,
+          isEnsure:this.relforms[index].isqueding,
           subjectAmount:this.relforms[index].entity2num,
           subject:this.nowlabelEntityName,
           tripleText:this.relforms[index].text
@@ -440,7 +454,7 @@ export default {
       }
       saveTriplets(params).then(res=>{
         if(res.code == 200){
-          this.getRelListFunction()
+          this.getRelListFunction(this.nowEditEntityId)
         }
       })
     },
@@ -508,6 +522,12 @@ export default {
       delete this.addEntityForm.entityType
       this.entityNameList =[]
       this.dialogFormVisible = true
+    },
+    quedingFunction(index){
+      this.$set(this.relforms, index, { ...this.relforms[index], isqueding: 2 });
+    },
+    cancelFunction(index){
+      this.$set(this.relforms, index, { ...this.relforms[index], isqueding: 0 });
     },
     dropOutPassage(){
       let params = {
@@ -618,6 +638,45 @@ export default {
         this.relNameList = res.data
       })
     },
+    deleteEntityRel(index){
+      let params ={
+        docInfoReq:{
+          docId:this.params.articleId,
+          docStatus:this.params.docStatus,
+          docType:this.params.docType,
+          uuid:this.nowEditEntityId,
+          dataType:this.nowlabelEntityType
+        },
+        saveTripletReqList:[{
+          id:this.relforms[index].id,
+          comment:'',
+          object:'',
+          objectAmount:'',
+          predicate:'',
+          predicateType:2,
+          isEnsure:0,
+          subjectAmount:'',
+          subject:'',
+          tripleText:''
+          }
+        ]
+      }
+      this.$confirm('是否删除该实例?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          saveTriplets(params).then(res=>{
+            if(res.code == 200){
+              this.$message({
+                type: 'success',
+                message: '删除成功!',
+              });
+              this.getRelListFunction(this.nowEditEntityId)
+            }
+          })
+        });
+    },
     getRelListFunction(id){
       let params = {
         docId:this.params.articleId,
@@ -628,7 +687,7 @@ export default {
       }
       let dataList = []
       getRelList(params).then(res=>{
-        dataList = res.data
+          dataList = res.data
           this.relforms = []
           dataList.forEach(item => {
             this.relforms.push({
@@ -636,7 +695,22 @@ export default {
               entityName1: item.object,
               relation: item.relationName,
               text:item.tripleText,
-              note:item.remark,
+              note:item.comment,
+              editing: false,
+              entity2num:item.objectAmount,
+              entity1num:item.subjectAmount,
+              isSelfDefinedRel:item.isCustomRel,
+              isAbstact:item.isExtract,
+              isqueding:item.isEnsure,
+              entityNameListbyRel:[],
+              isChangeSort:true,
+          });
+          this.relFormTemp.push({
+              id: item.id,
+              entityName1: item.object,
+              relation: item.relationName,
+              text:item.tripleText,
+              note:item.comment,
               editing: false,
               entity2num:item.objectAmount,
               entity1num:item.subjectAmount,
@@ -711,6 +785,14 @@ export default {
         this.entityNameList = res.data
       })
     },
+    resetRelform(index){
+      this.$set(this.relforms, index, { ...this.relforms[index], note:this.relFormTemp[index].note });
+      this.$set(this.relforms, index, { ...this.relforms[index], text:this.relFormTemp[index].text });
+      this.$set(this.relforms, index, { ...this.relforms[index], relation:this.relFormTemp[index].relation });
+      this.$set(this.relforms, index, { ...this.relforms[index], entityName1:this.relFormTemp[index].entityName1 });
+      this.$set(this.relforms, index, { ...this.relforms[index], entity1num:this.relFormTemp[index].entity1num });
+      this.$set(this.relforms, index, { ...this.relforms[index], entity2num:this.relFormTemp[index].entity2num });
+    },
     getStatusClass(status) {
       return {
         'status-1': status === 1,
@@ -720,6 +802,13 @@ export default {
         'status-5': status === 5,
         'status-6': status === 6,
         'status-7': status === 7,
+      };
+    },
+    getStatusClass1(index) {
+      return {
+        'relStatus-1': this.relforms[index].isqueding=== 2 && this.relforms[index].isAbstact == true,
+        'relStatus-2': this.relforms[index].isqueding=== 0 && this.relforms[index].isAbstact == true,
+        'relStatus-3': this.relforms[index].isAbstact == false,
       };
     },
     getStatusText(status) {
@@ -771,6 +860,41 @@ export default {
       this.isDetail = true
       this.getEntityListFunction()
       this.nowEditEntityId = ''
+    },
+    saveAllRelation(){
+      let saveTripletReqListTemp = []
+      console.log(this.relforms)
+      this.relforms.forEach(item => {
+        saveTripletReqListTemp.push({
+            id:item.id,
+            comment:item.note,
+            object:item.entityName1,
+            objectAmount:item.entity1num,
+            predicate:item.relation,
+            predicateType:2,
+            isEnsure:item.isqueding??'',
+            subjectAmount:item.entity2num,
+            subject:this.nowlabelEntityName,
+            tripleText:item.text
+          });
+      })
+      let params ={
+        docInfoReq:{
+          docId:this.params.articleId,
+          docStatus:this.params.docStatus,
+          docType:this.params.docType,
+          uuid:this.nowEditEntityId,
+          dataType:this.nowlabelEntityType
+        },
+        saveTripletReqList:saveTripletReqListTemp
+      }
+      saveAllRelations(params).then(res=>{
+        if(res.code == 200){
+          this.isDetail = true
+          this.getEntityListFunction()
+          this.nowEditEntityId = ''
+        }
+      })
     },
     isEditEntityName(){
       // getEntityNameByEntityType
@@ -976,10 +1100,6 @@ export default {
     cursor: pointer;
   }
 }
-::v-deep .el-tabs__content{
-  height: 70vh;
-  overflow-y: scroll;
-}
 .addRelClass{
   color: white;
   font-size: 16px;
@@ -1008,5 +1128,14 @@ export default {
   .el-form-item__content{
     margin-left: 70px !important
   }
+}
+.relStatus-1{
+  color: #95F204;
+}
+.relStatus-2{
+  color: #FFFF00;
+}
+.relStatus-3{
+  color: white;
 }
 </style>
