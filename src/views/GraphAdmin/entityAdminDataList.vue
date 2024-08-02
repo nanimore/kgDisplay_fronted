@@ -24,9 +24,9 @@
                     style="width: 250px;">
                 </el-date-picker>
             </el-form-item>
-            <el-form-item label="标注时间" prop="distributiontime">
+            <el-form-item label="标注时间" prop="publishTime">
                 <el-date-picker
-                    v-model="queryParams.distributiontime"
+                    v-model="queryParams.publishTime"
                     type="datetimerange"
                     range-separator="至"
                     start-placeholder="开始日期"
@@ -115,7 +115,8 @@
 </template>
   
 <script>
-import { labelNewsList,getinitDocType,getInitDocCategory,pullData,getInitProofreaders,getInitDatasourceName } from "@/api/datalabel/label";
+import { labelNewsList,getinitDocType,getInitDocCategory,pullData,getInitProofreaders,getInitDatasourceName, } from "@/api/datalabel/label";
+import { getInitDocListByUUid } from "@/api/entityAdmin"
 export default {
   props:['params'],
   name: "dataLabel",
@@ -172,13 +173,13 @@ export default {
         },
         queryParams: {
             keyword: '',
-            distributiontime:[],
             dataType:'',
             docType:'',
             proofreader:'',
-            publishtime:[],
+            publishTime:[],
             docStatus:4,
-            createTime:[]
+            createTime:[],
+            datasourceName:''
         },
         labelPosition:'right',
         dialogFormVisible: false,
@@ -245,19 +246,13 @@ export default {
         })
     },
     handleQuery(pageSize,currentpage){
-        let disstartDate ='';
-        let disendDate = '';
         let pubstartDate = '';
         let pubendDate = '';
         let createstartDate = '';
         let createendtDate = '';
-        if(this.queryParams.distributiontime.length === 2){
-            disstartDate = this.formatDate(this.queryParams.distributiontime[0]);
-            disendDate = this.formatDate(this.queryParams.distributiontime[1]);
-        }
-        if(this.queryParams.publishtime.length === 2){
-            pubstartDate = this.formatDate(this.queryParams.publishtime[0]);
-            pubendDate = this.formatDate(this.queryParams.publishtime[1]);
+        if(this.queryParams.publishTime.length === 2){
+            pubstartDate = this.formatDate(this.queryParams.publishTime[0]);
+            pubendDate = this.formatDate(this.queryParams.publishTime[1]);
         }
         if(this.queryParams.createTime.length === 2){
             createstartDate = this.formatDate(this.queryParams.createTime[0]);
@@ -274,19 +269,18 @@ export default {
         const params = {
           docType: this.queryParams.docType,
           dataType: this.queryParams.dataType,
-          keyword:this.queryParams.keyword,
           docStatus:this.queryParams.docStatus,
-          assignTimeStart:disstartDate,
-          assignTimeEnd:disendDate,
+          datasourceName:this.queryParams.datasourceName,
           createTimeStart:createstartDate,
           createTimeEnd:createendtDate,
           publishTimeStart:pubstartDate,
           publishTimeEnd:pubendDate,
-          pageStatus:0,
           page:currentPageTemp,
-          size:pagesizeTemp
+          size:pagesizeTemp,
+          proofreader:this.queryParams.proofreader,
+          entityUuid:this.params.entityUuid
         };
-        labelNewsList(params).then(res => {
+        getInitDocListByUUid(params).then(res => {
             this.newDataList = res.data.docResList
             this.totalNum = res.data.totalCount
         });

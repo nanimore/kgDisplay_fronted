@@ -8,3 +8,11 @@ import request from '@/utils/request'
       data: query
     })
   }
+  export function getInitDocListByUUid(query) {
+    console.log(query)
+    return request({
+      url: '/articleFilter/getEntityListByUUid',
+      method: 'post',
+      data: query
+    })
+  }

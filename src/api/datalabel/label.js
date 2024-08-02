@@ -182,3 +182,10 @@ import request from '@/utils/request'
       data: query,
     })
   }
+  export function saveAllProperties(query) {
+    return request({
+      url: '/proofread/saveAllProperties',
+      method: 'post',
+      data: query,
+    })
+  }

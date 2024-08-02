@@ -1,6 +1,6 @@
 <template>
     <div class="newListDetailContainer">
-      <el-dialog :title="isEditEntityName?'添加实例':'编辑实例'" :visible.sync="dialogFormVisible"	:modal="false" v-draggable center :close-on-click-modal="false" width="35%" custom-class="my-dialog">
+      <el-dialog :title="isEditEntityName1?'添加实例':'编辑实例'" :visible.sync="dialogFormVisible"	:modal="false" v-draggable center :close-on-click-modal="false" width="35%" custom-class="my-dialog">
         <el-dialog
           width="30%"
           title="名称规范示例"
@@ -118,43 +118,57 @@
           </div>
           <el-tabs class="entityDetailInnerContent" v-model="activeName" style="margin-top: 10px;color: #02A7F0;">
             <el-tab-pane label="实例属性" name="first">
-              <div class="addSelfProp" @click="addSelfProp()" ><img src="../../assets/images/u1895.svg" style="width: 15px;height: 15px;margin-right: 8px;"></img><span style="cursor: pointer;">自定义属性</span></div>
-              <div v-if="formVisible">
-                <el-form :model="selfDefinePropForm" class="selfDefinePropForm" label-width="60px">
-                  <el-form-item :label="item.label" v-for="item in selfDefinePropForm.items" :key="item.label">
-                    <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getSelectedText(item.id)">
-                    <el-input v-model="item.value" style="margin-right: 20px;"></el-input>
-                    <span v-if="item.id==0">
-                      <el-button type="primary" size="mini"  style="background-color: #00BFBF;text-align: center;margin-right: 20px;">添加别名</el-button>
-                      <span class="selfDefinePropFormSpan"  @click="removeForm()">暂存</span>
-                      <span class="selfDefinePropFormSpan" @click="removeForm()">取消</span>
-                      <span class="selfDefinePropFormSpan" @click="removeForm()">清除</span>
-                    </span>
-                  </el-form-item>
-                </el-form>
+                <div class="addSelfProp" @click="addSelfProp()" ><img src="../../assets/images/u1895.svg" style="width: 15px;height: 15px;margin-right: 8px;"></img><span style="cursor: pointer;">自定义属性</span></div>
+                <div style="height: 62vh;overflow-y: auto;">
+                <div v-if="formVisible">
+                  <el-form :model="selfDefinePropForm" class="selfDefinePropForm" label-width="60px">
+                    <el-form-item :label="item.label" v-for="item in selfDefinePropForm.items" :key="item.label">
+                      <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getSelectedText(item.id)">
+                      <el-input v-model="item.value" style="margin-right: 20px;"></el-input>
+                      <span v-if="item.id==0">
+                        <el-button type="primary" size="mini"  style="background-color: #00BFBF;text-align: center;margin-right: 20px;">添加别名</el-button>
+                        <span class="selfDefinePropFormSpan"  @click="removeForm()">暂存</span>
+                        <span class="selfDefinePropFormSpan" @click="removeForm()">取消</span>
+                        <span class="selfDefinePropFormSpan" @click="removeForm()">清除</span>
+                      </span>
+                    </el-form-item>
+                  </el-form>
+                </div>
+                <div v-for="(form, index) in propForm" :key="form.index">
+                  <div v-if="form.editing">
+                    <el-form :model="form" ref="form">
+                      <el-form-item>  
+                        <el-input v-model="form[item.engName]" style="width: 250px;"></el-input>  
+                      </el-form-item>  
+                    </el-form> 
+                  </div>
+                  <div v-else>
+                    <el-form :model="form" ref="form" class="propFormClass">
+                      <el-form-item>
+                        <label  @click="handleCustomLabelClick(index)" style="width: 70px;text-align: right;display: inline-block;margin-right: 35px;cursor: pointer;">{{form.name}}</label>
+                        <span v-if="form.propertyValueList" style="margin-right: 15px" :class="getStatusClass2(index)">{{form.propertyValueList[0].object}}</span>
+                        <span v-if="form.propertyValueList && form.isEnsure == 0" style="cursor: pointer;">[确定]</span>
+                        <span v-if="form.propertyValueList && form.isEnsure == 1" style="cursor: pointer;color: #FFFF00;">[取消]</span>
+                      </el-form-item>
+                      <el-form-item label="文本" class="teshu1">
+                        <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedText(index)">
+                        <el-input v-model="form.text" style="width: 250px;"></el-input>
+                      </el-form-item>  
+                    </el-form> 
+                  </div>
+                </div>
               </div>
-              <el-form :model="propForm" ref="propForm" label-width="100px">  
-                <el-form-item  
-                  v-for="(item, index) in formItems"  
-                  :key="index"  
-                  :label="item.name"  
-                  :prop="item.engName"  
-                >  
-                  <el-input v-model="form[item.engName]" style="width: 250px;"></el-input>  
-                  <!-- 这里可以根据需要添加其他类型的表单组件，如密码框、邮箱框等 -->  
-                </el-form-item>  
-                <el-form-item>  
-                  <el-button type="primary" @click="submitForm('propForm')">保存全部属性</el-button>  
-                </el-form-item>  
-              </el-form> 
+              <div style="text-align: center;padding: 10px 0;padding-bottom: 0;">
+                <el-button type="primary" size="mini" style="background-color: #00BFBF;" @click="saveAllPropertie()">保存全部属性</el-button>
+              </div>
             </el-tab-pane>
             <el-tab-pane label="实例关系" name="second">
-              <div style="height: 65vh;overflow-y: auto;">
               <div class="addRelClass">
                 <span class="addRelClassContainer" @click="addEntity('addEntityForm')"><img src="../../assets/images/u3832.svg" class="addClass">添加实例</span>
                 <span class="addRelClassContainer" @click="addrelForm()" style="margin-left: 20px;"><img src="../../assets/images/u3832.svg" class="addClass">添加关系</span>
               </div>
-                <div v-for="(form, index) in relforms" :key="form.id" style="border-bottom: 1px solid #aaaaaa;">
+              <div style="height: 62vh;overflow-y: auto;">
+                <div v-for="(form, index) in relforms" :key="form.index" style="border-bottom: 1px solid #aaaaaa;">
                   <div v-if="form.editing">
                     <el-form :model="form" label-width="90px" ref="form" class="relform">
                       <el-row>
@@ -276,7 +290,7 @@
                         <el-col :span="10">
                           <div>
                             <span v-if="form.isAbstact&&form.isqueding == 0" style="color: yellow;cursor: pointer;margin-left: 15px;" @click="quedingFunction(index)">确定</span>
-                            <span v-if="form.isAbstact&&form.isqueding == 2" style="color: red;cursor: pointer;margin-left: 15px;" @click="cancelFunction(index)">取消</span>
+                            <span v-if="form.isAbstact&&form.isqueding == 1" style="color: red;cursor: pointer;margin-left: 15px;" @click="cancelFunction(index)">取消</span>
                             <el-button type="primary" style="background-color: #03afb0;margin-right: 10px;margin-left: 15px;" @click="editrelForm(index)" v-if="!form.editing">编辑</el-button>
                             <el-button type="primary" style="background-color: #03afb0;margin-right: 10px;margin-left: 15px;" @click="saveForm(index)" v-if="form.editing">暂存</el-button>
                             <el-button type="primary" style="background-color: #aaaaaa;margin-right: 10px;margin-left: 15px;" @click="getRelListFunction(nowEditEntityId)" v-if="form.editing">取消</el-button>
@@ -299,7 +313,7 @@
 </template>
 
 <script>
-import { annotationFistPage,getEntityList,getRelList,discard,saveTriplets,saveAllRelations,getEntityNameByEntityType,deleteEntity,getPropList,chineseAnnotation,getAllLeafEntityTypes,similarInstanceNames,addInstance,getRelationByEntityType,getEntityByRelation } from "@/api/datalabel/label";
+import { annotationFistPage,getEntityList,getRelList,discard,saveTriplets,saveAllRelations,getEntityNameByEntityType,deleteEntity,getPropList,saveAllProperties,chineseAnnotation,getAllLeafEntityTypes,similarInstanceNames,addInstance,getRelationByEntityType,getEntityByRelation } from "@/api/datalabel/label";
 import { getAllEntityType } from "@/api/index";
 export default {
   props:['params'],
@@ -352,6 +366,7 @@ export default {
         labelPosition:'right',
         nowlabelEntityName:'',
         nowlabelEntityType:'',
+        nowhuaciPropIndex:'',
         nowhuaciIndex:'',
         selfDefinePropForm:{
           items: [
@@ -420,6 +435,7 @@ export default {
       // axios.post('/api/forms', form).then(() => {
       //   this.$set(this.forms, index, { ...form, editing: false });
       // });
+      console.log(this.relforms[index].isqueding)
       if(this.relforms[index].entityName1==''||this.relforms[index].relation==''||this.relforms[index].text==''){
         this.$message.error("关系名称、尾实例名称、文本不能为空！")
         return false
@@ -454,7 +470,8 @@ export default {
       }
       saveTriplets(params).then(res=>{
         if(res.code == 200){
-          this.getRelListFunction(this.nowEditEntityId)
+          // this.getRelListFunction(this.nowEditEntityId)
+          this.$set(this.relforms, index, { ...this.relforms[index], editing:false });
         }
       })
     },
@@ -524,7 +541,7 @@ export default {
       this.dialogFormVisible = true
     },
     quedingFunction(index){
-      this.$set(this.relforms, index, { ...this.relforms[index], isqueding: 2 });
+      this.$set(this.relforms, index, { ...this.relforms[index], isqueding: 1 });
     },
     cancelFunction(index){
       this.$set(this.relforms, index, { ...this.relforms[index], isqueding: 0 });
@@ -588,6 +605,19 @@ export default {
           // 停止监听鼠标抬起事件
       document.removeEventListener('mouseup', this.handleTextSelection);
     },
+    getPropListSelectedText(index){
+      this.nowhuaciPropIndex = index
+      document.addEventListener('mouseup', this.handleTextSelectionPropText);
+    },
+    handleTextSelectionPropText(){
+      const selectedText = window.getSelection().toString();
+      console.log(selectedText)
+      if (selectedText) {
+        this.$set(this.propForm, this.nowhuaciPropIndex, { ...this.propForm[this.nowhuaciPropIndex], text: selectedText + ' ' });
+      }
+          // 停止监听鼠标抬起事件
+      document.removeEventListener('mouseup', this.handleTextSelectionPropText);
+    },
     remoteMethodEntityList(query){
       console.log(this.nowremoteIndex)
       let params = {
@@ -618,6 +648,7 @@ export default {
       this.getPropListFunction(item.uuid)
       this.getRelListFunction(item.uuid)
       this.nowEditEntityId = item.uuid
+      this.activeName = 'first'
     },
     enterRel(item){
       this.isDetail = false
@@ -649,15 +680,6 @@ export default {
         },
         saveTripletReqList:[{
           id:this.relforms[index].id,
-          comment:'',
-          object:'',
-          objectAmount:'',
-          predicate:'',
-          predicateType:2,
-          isEnsure:0,
-          subjectAmount:'',
-          subject:'',
-          tripleText:''
           }
         ]
       }
@@ -730,11 +752,25 @@ export default {
         docType:this.params.docType,
         uuid:id
       }
+      let dataList = []
       getPropList(params).then(res=>{
-        this.formItems = res.data
+          dataList = res.data
+          this.propForm = []
+          dataList.forEach(item => {
+            this.propForm.push({
+              id: item.id,
+              text:item.tripleText,
+              editing: false,
+              name:item.name,
+              propertyValueList:item.propertyValueList,
+              isEnsure:item.isEnsure,
+              isExtract:item.isExtract
+          });
+        });
       })
     },
     submitForm(formName) {
+      console.log(this.addEntityForm.entityName)
         this.$refs[formName].validate((valid) => {
           if (valid) {
             let params = {
@@ -806,9 +842,18 @@ export default {
     },
     getStatusClass1(index) {
       return {
-        'relStatus-1': this.relforms[index].isqueding=== 2 && this.relforms[index].isAbstact == true,
+        'relStatus-1': this.relforms[index].isqueding=== 1 && this.relforms[index].isAbstact == true,
         'relStatus-2': this.relforms[index].isqueding=== 0 && this.relforms[index].isAbstact == true,
         'relStatus-3': this.relforms[index].isAbstact == false,
+        'relStatus-4': this.relforms[index].isqueding == 2 && this.relforms[index].isAbstact == true,
+      };
+    },
+    getStatusClass2(index) {
+      return {
+        'relStatus-1': this.propForm[index].isEnsure=== 1 && this.propForm[index].isExtract == true,
+        'relStatus-2': this.propForm[index].isEnsure=== 0 && this.propForm[index].isExtract == true,
+        'relStatus-3': this.propForm[index].isExtract == false,
+        'relStatus-4': this.propForm[index].isEnsure == 2 && this.propForm[index].isExtract == true,
       };
     },
     getStatusText(status) {
@@ -842,15 +887,18 @@ export default {
       this.highlightedContent = this.passageDetail.content.replace(regex, '<span class="highlight">$&</span>');  
     },  
     changeSelfDefine(){
-      this.addEntityForm.entityType = '';
+      delete this.addEntityForm.entityType;
       this.selfdefine = !this.selfdefine
     },
     getNameRegualation(){
-      if(this.addEntityForm.entityType==''&&this.nowlabelEntityType==''){
+      console.log(this.addEntityForm.entityType)
+      console.log(this.nowlabelEntityType)
+      if(this.addEntityForm.entityType){
+        this.innerVisible =true
+      }else{
         this.$message.error('请先选择实例类型！')
-         return false
+        return false
       }
-      this.innerVisible =true
     },
     aliasFindHighLight(data){
       this.searchQuery = data
@@ -860,10 +908,13 @@ export default {
       this.isDetail = true
       this.getEntityListFunction()
       this.nowEditEntityId = ''
+      this.relforms = []
+    },
+    saveAllPropertie(){
+
     },
     saveAllRelation(){
       let saveTripletReqListTemp = []
-      console.log(this.relforms)
       this.relforms.forEach(item => {
         saveTripletReqListTemp.push({
             id:item.id,
@@ -901,6 +952,12 @@ export default {
       this.isEditEntityName1 = false
       this.addEntityForm.entityName = this.nowlabelEntityName
       this.dialogFormVisible =true
+    },
+    handleCustomLabelClick(index){
+      this.$set(this.propForm, index, {
+        ...this.propForm,
+        editing: true
+      });
     },
     getSelectedText(index) {
       let selectedText = '';
@@ -966,7 +1023,7 @@ export default {
   padding: 30px;
 }
 .newDetail{
-  width: 50%;
+  flex:1;
   border-radius: 20px;
   border: 1px solid rgba(129,211,248,1);
   height: 84vh;
@@ -974,7 +1031,7 @@ export default {
   padding: 10px;
 }
 .entityDetail{
-  width: 50%;
+  flex:1;
   margin-left: 50px;
 }
 .entityTitle{
@@ -1129,6 +1186,12 @@ export default {
     margin-left: 70px !important
   }
 }
+::v-deep .teshu1{
+  .el-form-item__label{
+    color: white !important;
+  }
+  margin-left: 40px
+}
 .relStatus-1{
   color: #95F204;
 }
@@ -1137,5 +1200,13 @@ export default {
 }
 .relStatus-3{
   color: white;
+}
+.relStatus-4{
+  color: #D9001B;
+}
+.propFormClass{
+  .el-form-item{
+    margin-bottom: 5px;
+  }
 }
 </style>
