@@ -240,7 +240,7 @@
                             <span v-if="form.editing" style="color: red;cursor: pointer;margin-left: 15px;" @click="clearRelform(index)">清除</span>
                             <el-button type="primary" style="background-color: #03afb0;margin-right: 10px;margin-left: 15px;" @click="editrelForm(index)" v-if="!form.editing">编辑</el-button>
                             <el-button type="primary" style="background-color: #03afb0;margin-right: 10px;margin-left: 15px;" @click="saveForm(index)" v-if="form.editing">暂存</el-button>
-                            <el-button type="primary" style="background-color: #aaaaaa;margin-right: 10px;margin-left: 15px;" @click="getRelListFunction(nowEditEntityId)" v-if="form.editing">取消</el-button>
+                            <el-button type="primary" style="background-color: #aaaaaa;margin-right: 10px;margin-left: 15px;" @click="form.editing = false" v-if="form.editing">取消</el-button>
                           </div>
                         </el-col>
                       </el-row>
@@ -694,7 +694,7 @@ export default {
                 type: 'success',
                 message: '删除成功!',
               });
-              this.getRelListFunction(this.nowEditEntityId)
+              this.relforms.splice(index, 1);
             }
           })
         });
