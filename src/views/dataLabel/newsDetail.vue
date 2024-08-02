@@ -148,7 +148,7 @@
                         <label  @click="handleCustomLabelClick(index)" style="width: 70px;text-align: right;display: inline-block;margin-right: 35px;cursor: pointer;">{{form.name}}</label>
                         <span v-if="form.propertyValueList" style="margin-right: 15px" :class="getStatusClass2(index)">{{form.propertyValueList[0].object}}</span>
                         <span v-if="form.propertyValueList && form.isEnsure == 0" style="cursor: pointer;">[确定]</span>
-                        <span v-if="form.propertyValueList && form.isEnsure == 1" style="cursor: pointer;color: #FFFF00;">[取消]</span>
+                        <span v-if="form.propertyValueList && form.isEnsure == 1" style="cursor: pointer;color:#FFFF00">[取消]</span>
                       </el-form-item>
                       <el-form-item label="文本" class="teshu1">
                         <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedText(index)">
@@ -240,7 +240,7 @@
                             <span v-if="form.editing" style="color: red;cursor: pointer;margin-left: 15px;" @click="clearRelform(index)">清除</span>
                             <el-button type="primary" style="background-color: #03afb0;margin-right: 10px;margin-left: 15px;" @click="editrelForm(index)" v-if="!form.editing">编辑</el-button>
                             <el-button type="primary" style="background-color: #03afb0;margin-right: 10px;margin-left: 15px;" @click="saveForm(index)" v-if="form.editing">暂存</el-button>
-                            <el-button type="primary" style="background-color: #aaaaaa;margin-right: 10px;margin-left: 15px;" @click="form.editing = false" v-if="form.editing">取消</el-button>
+                            <el-button type="primary" style="background-color: #aaaaaa;margin-right: 10px;margin-left: 15px;" @click="getRelListFunction(nowEditEntityId)" v-if="form.editing">取消</el-button>
                           </div>
                         </el-col>
                       </el-row>
@@ -313,7 +313,7 @@
 </template>
 
 <script>
-import { annotationFistPage,getEntityList,getRelList,discard,saveTriplets,saveAllRelations,getEntityNameByEntityType,deleteEntity,getPropList,saveAllProperties,chineseAnnotation,getAllLeafEntityTypes,similarInstanceNames,addInstance,getRelationByEntityType,getEntityByRelation } from "@/api/datalabel/label";
+import { annotationFistPage,getEntityList,getRelList,discard,confirmOrCancel,saveTriplets,saveAllRelations,getEntityNameByEntityType,deleteEntity,getPropList,saveAllProperties,chineseAnnotation,getAllLeafEntityTypes,similarInstanceNames,addInstance,getRelationByEntityType,getEntityByRelation } from "@/api/datalabel/label";
 import { getAllEntityType } from "@/api/index";
 export default {
   props:['params'],
@@ -470,8 +470,7 @@ export default {
       }
       saveTriplets(params).then(res=>{
         if(res.code == 200){
-          // this.getRelListFunction(this.nowEditEntityId)
-          this.$set(this.relforms, index, { ...this.relforms[index], editing:false });
+          this.getRelListFunction(this.nowEditEntityId)
         }
       })
     },
@@ -541,10 +540,30 @@ export default {
       this.dialogFormVisible = true
     },
     quedingFunction(index){
-      this.$set(this.relforms, index, { ...this.relforms[index], isqueding: 1 });
+      let idListTemp =[]
+      idListTemp[0]=this.relforms[index].id
+      let params ={
+        idList:idListTemp,
+        isEnsure:1
+      }
+      confirmOrCancel(params).then(res=>{
+        if(res.code == 200){
+          this.$set(this.relforms, index, { ...this.relforms[index], isqueding: 1 });
+        }
+      })
     },
     cancelFunction(index){
-      this.$set(this.relforms, index, { ...this.relforms[index], isqueding: 0 });
+      let idListTemp =[]
+      idListTemp[0]=this.relforms[index].id
+      let params ={
+        idList:idListTemp,
+        isEnsure:0
+      }
+      confirmOrCancel(params).then(res=>{
+        if(res.code == 200){
+          this.$set(this.relforms, index, { ...this.relforms[index], isqueding: 0 });
+        }
+      })
     },
     dropOutPassage(){
       let params = {
@@ -680,6 +699,15 @@ export default {
         },
         saveTripletReqList:[{
           id:this.relforms[index].id,
+          comment:'',
+          object:'',
+          objectAmount:'',
+          predicate:'',
+          predicateType:2,
+          isEnsure:0,
+          subjectAmount:'',
+          subject:'',
+          tripleText:''
           }
         ]
       }
@@ -694,7 +722,7 @@ export default {
                 type: 'success',
                 message: '删除成功!',
               });
-              this.relforms.splice(index, 1);
+              this.getRelListFunction(this.nowEditEntityId)
             }
           })
         });
@@ -711,6 +739,7 @@ export default {
       getRelList(params).then(res=>{
           dataList = res.data
           this.relforms = []
+          this.relFormTem = []
           dataList.forEach(item => {
             this.relforms.push({
               id: item.id,
@@ -822,12 +851,14 @@ export default {
       })
     },
     resetRelform(index){
-      this.$set(this.relforms, index, { ...this.relforms[index], note:this.relFormTemp[index].note });
-      this.$set(this.relforms, index, { ...this.relforms[index], text:this.relFormTemp[index].text });
-      this.$set(this.relforms, index, { ...this.relforms[index], relation:this.relFormTemp[index].relation });
-      this.$set(this.relforms, index, { ...this.relforms[index], entityName1:this.relFormTemp[index].entityName1 });
-      this.$set(this.relforms, index, { ...this.relforms[index], entity1num:this.relFormTemp[index].entity1num });
-      this.$set(this.relforms, index, { ...this.relforms[index], entity2num:this.relFormTemp[index].entity2num });
+      if(this.relFormTemp[index]){
+        this.$set(this.relforms, index, { ...this.relforms[index], note:this.relFormTemp[index].note });
+        this.$set(this.relforms, index, { ...this.relforms[index], text:this.relFormTemp[index].text });
+        this.$set(this.relforms, index, { ...this.relforms[index], relation:this.relFormTemp[index].relation });
+        this.$set(this.relforms, index, { ...this.relforms[index], entityName1:this.relFormTemp[index].entityName1 });
+        this.$set(this.relforms, index, { ...this.relforms[index], entity1num:this.relFormTemp[index].entity1num });
+        this.$set(this.relforms, index, { ...this.relforms[index], entity2num:this.relFormTemp[index].entity2num });
+      }
     },
     getStatusClass(status) {
       return {

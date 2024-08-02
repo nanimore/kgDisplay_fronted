@@ -189,3 +189,10 @@ import request from '@/utils/request'
       data: query,
     })
   }
+  export function confirmOrCancel(query) {
+    return request({
+      url: '/proofread/confirmOrCancel',
+      method: 'post',
+      data: query,
+    })
+  }
