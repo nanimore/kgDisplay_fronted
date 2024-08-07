@@ -1,5 +1,8 @@
 <template>
     <div class="newListDetailContainer">
+      <el-dialog :visible.sync="imageDialogVisible">
+        <img width="100%" :src="dialogImageUrl" alt="">
+      </el-dialog>
       <el-dialog :title="isEditEntityName1?'添加实例':'编辑实例'" :visible.sync="dialogFormVisible"	:modal="false" v-draggable center :close-on-click-modal="false" width="35%" custom-class="my-dialog">
         <el-dialog
           width="30%"
@@ -80,7 +83,7 @@
           <div class="addEntity" @click="addEntity('addEntityForm')"><img src="../../assets/images/u1895.svg" style="width: 15px;height: 15px;margin-right: 8px;"></img><span>添加实例</span></div>
           <div class="entityListContainer">
             <ul class="entityList" >
-              <li v-for="item in extractData" :key="item.id">
+              <li v-for="item in extractData" :key="item.id" style="display: flex;justify-content: space-between;">
                 <span class="entityListLeftContainer">
                   <span>{{ item.entityName }}</span>
                   <span class="entityListLabel" v-if="item.isSaveProp">已经保存属性</span>
@@ -135,25 +138,54 @@
                   </el-form>
                 </div>
                 <div v-for="(form, index) in propForm" :key="form.index">
-                  <div v-if="form.editing">
+                  <!-- <div v-if="form.editing">
                     <el-form :model="form" ref="form">
                       <el-form-item>  
                         <el-input v-model="form[item.engName]" style="width: 250px;"></el-input>  
                       </el-form-item>  
                     </el-form> 
-                  </div>
-                  <div v-else>
+                  </div> -->
+                  <div >
                     <el-form :model="form" ref="form" class="propFormClass">
-                      <el-form-item>
-                        <label  @click="handleCustomLabelClick(index)" style="width: 70px;text-align: right;display: inline-block;margin-right: 35px;cursor: pointer;">{{form.name}}</label>
-                        <span v-if="form.propertyValueList" style="margin-right: 15px" :class="getStatusClass2(index)">{{form.propertyValueList[0].object}}</span>
-                        <span v-if="form.propertyValueList && form.isEnsure == 0" style="cursor: pointer;">[确定]</span>
-                        <span v-if="form.propertyValueList && form.isEnsure == 1" style="cursor: pointer;color:#FFFF00">[取消]</span>
-                      </el-form-item>
-                      <el-form-item label="文本" class="teshu1">
-                        <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedText(index)">
-                        <el-input v-model="form.text" style="width: 250px;"></el-input>
-                      </el-form-item>  
+                      <div v-if="form.dataType !== 'PICTURE'">
+                        <el-form-item>
+                          <label  @click="handleCustomLabelClick(index)" style="width: 70px;text-align: right;display: inline-block;margin-right: 35px;cursor: pointer;">{{form.name}}</label>
+                          <span v-if="form.propertyValueList" style="margin-right: 15px" :class="getStatusClass2(index)">{{form.propertyValueList[0].object}}</span>
+                          <span v-if="form.propertyValueList && form.isEnsure == 0 && form.isExtract" style="cursor: pointer;" @click="propConfirmFunction(index)">[确定]</span>
+                          <span v-if="form.propertyValueList && form.isEnsure == 1 && form.isExtract" style="cursor: pointer;color:#FFFF00" @click="propCancelFunction(index)">[取消]</span>
+                          <span v-if="form.propertyValueList && form.missingText && form.isExtract" style="color:#C280FF;margin-left:15px">[待填写文本]</span>
+                        </el-form-item>
+                        <!-- <el-form-item>
+                          <span>{{ form.dataType }}</span>
+                        </el-form-item> -->
+                        <el-form-item label="文本" class="teshu1">
+                          <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedText(index)">
+                          <el-input v-model="form.text" style="width: 250px;" :disabled="form.isEnsure == 1" :class="getStatusClass3(index)"></el-input>
+                        </el-form-item>
+                      </div>
+                      <div v-else>
+                        <el-form-item>
+                          <label  @click="handleCustomLabelClick(index)" style="width: 70px;text-align: right;display: inline-block;margin-right: 35px;cursor: pointer;">{{form.name}}</label>
+                          <el-image 
+                            style="width: 100px; height: 100px"
+                            v-for="url in form.imageList" 
+                            :key="url"
+                            :src="url" 
+                            :preview-src-list="imageList">
+                            <div slot="error" class="image-slot">
+                              <i class="el-icon-picture-outline"></i>
+                            </div>
+                          </el-image>
+                          <el-upload
+                            action="#"
+                            list-type="picture-card"
+                            :on-preview="handlePictureCardPreview"
+                            :auto-upload="false"
+                            :on-remove="handleRemove" style="display: inline-block;">
+                            <i class="el-icon-plus"></i>
+                          </el-upload>
+                        </el-form-item>
+                      </div>
                     </el-form> 
                   </div>
                 </div>
@@ -339,6 +371,7 @@ export default {
         formItems:[],
         propForm:{},
         relforms:[],
+        imageDialogVisible:false,
         nowremoteIndex:0,
         isDetail:true,
         passageDetail:{},
@@ -352,6 +385,8 @@ export default {
           entityName:'',
           text:''
         },
+        dialogImageUrl:'',
+        disabled:false,
         nowEditEntityId:'',
         relform: {}, // 用于存储表单数据的对象  
         entityNameList:[],
@@ -540,10 +575,12 @@ export default {
       this.dialogFormVisible = true
     },
     quedingFunction(index){
-      let idListTemp =[]
-      idListTemp[0]=this.relforms[index].id
       let params ={
-        idList:idListTemp,
+        idAndTextList:[{
+          id:this.relforms[index].id,
+          tripleText:this.relforms[index].text
+        }
+      ],
         isEnsure:1
       }
       confirmOrCancel(params).then(res=>{
@@ -553,10 +590,12 @@ export default {
       })
     },
     cancelFunction(index){
-      let idListTemp =[]
-      idListTemp[0]=this.relforms[index].id
       let params ={
-        idList:idListTemp,
+        idAndTextList:[{
+          id:this.relforms[index].id,
+          tripleText:this.relforms[index].text
+        }
+      ],
         isEnsure:0
       }
       confirmOrCancel(params).then(res=>{
@@ -727,6 +766,35 @@ export default {
           })
         });
     },
+    propConfirmFunction(index){
+      let params ={
+        idAndTextList:[{
+          id:this.propForm[index].propertyValueList[0].id,
+          tripleText:this.propForm[index].text
+        }],
+        isEnsure:1
+      }
+      confirmOrCancel(params).then(res=>{
+        if(res.code == 200){
+          this.$set(this.propForm, index, { ...this.propForm[index], isEnsure: 1 });
+          this.$set(this.propForm, index, { ...this.propForm[index], missingText: false });
+        }
+      })
+    },
+    propCancelFunction(index){
+      let params ={
+        idAndTextList:[{
+          id:this.propForm[index].propertyValueList[0].id,
+          tripleText:this.propForm[index].text
+        }],
+        isEnsure:0
+      }
+      confirmOrCancel(params).then(res=>{
+        if(res.code == 200){
+          this.$set(this.propForm, index, { ...this.propForm[index], isEnsure: 0 });
+        }
+      })
+    },
     getRelListFunction(id){
       let params = {
         docId:this.params.articleId,
@@ -793,7 +861,9 @@ export default {
               name:item.name,
               propertyValueList:item.propertyValueList,
               isEnsure:item.isEnsure,
-              isExtract:item.isExtract
+              isExtract:item.isExtract,
+              dataType:item.dataType,
+              missingText:this.getMissingText(item)
           });
         });
       })
@@ -841,6 +911,11 @@ export default {
           this.entityNameList = [];
         }
     },
+    handlePictureCardPreview(file) {
+      console.log(file)
+        this.dialogImageUrl = file.url;
+        this.imageDialogVisible = true;
+    },
     getEntityNameByEntityTypeFunction(){
       let params = {
           entityType:this.nowlabelEntityType
@@ -858,6 +933,13 @@ export default {
         this.$set(this.relforms, index, { ...this.relforms[index], entityName1:this.relFormTemp[index].entityName1 });
         this.$set(this.relforms, index, { ...this.relforms[index], entity1num:this.relFormTemp[index].entity1num });
         this.$set(this.relforms, index, { ...this.relforms[index], entity2num:this.relFormTemp[index].entity2num });
+      }
+    },
+    getMissingText(item) {
+      if(item.propertyValueList){
+        return item.propertyValueList[0].missingText
+      }else{
+        return false
       }
     },
     getStatusClass(status) {
@@ -885,6 +967,14 @@ export default {
         'relStatus-2': this.propForm[index].isEnsure=== 0 && this.propForm[index].isExtract == true,
         'relStatus-3': this.propForm[index].isExtract == false,
         'relStatus-4': this.propForm[index].isEnsure == 2 && this.propForm[index].isExtract == true,
+      };
+    },
+    getStatusClass3(index) {
+      return {
+        'relinputStatus-1': this.propForm[index].isEnsure=== 1 && this.propForm[index].isExtract == true,
+        'relinputStatus-2': this.propForm[index].isEnsure=== 0 && this.propForm[index].isExtract == true,
+        'relinputStatus-3': this.propForm[index].isExtract == false,
+        'relinputStatus-4': this.propForm[index].isEnsure == 2 && this.propForm[index].isExtract == true,
       };
     },
     getStatusText(status) {
@@ -944,6 +1034,12 @@ export default {
     saveAllPropertie(){
 
     },
+    handleRemove(file) {
+        console.log(file);
+      },
+      handleDownload(file) {
+        console.log(file);
+      },
     saveAllRelation(){
       let saveTripletReqListTemp = []
       this.relforms.forEach(item => {
@@ -1025,19 +1121,21 @@ export default {
     padding-bottom: 5px;
     margin-bottom: 30px;
     .entityListRightContainer{
-      float:right;
       display: flex;
-      align-items: center; 
+      align-items: center;
       span{
         margin-right: 10px;
         cursor: pointer;
       }
-      
       img {
         cursor: pointer;
       }
     }
   }
+}
+.entityListLeftContainer{
+  display: flex;
+  align-items: center;
 }
 .entityListLeftContainer span{
   margin-right: 10px;
@@ -1235,9 +1333,42 @@ export default {
 .relStatus-4{
   color: #D9001B;
 }
+::v-deep .relinputStatus-1{
+  .el-input__inner{
+    color: #95F204;
+    background-color: #111725;
+  }
+}
+::v-deep .relinputStatus-2{
+  .el-input__inner{
+    color: #FFFF00;
+    background-color: #111725;
+  }
+}
+::v-deep .relinputStatus-3{
+  .el-input__inner{
+    color: white;
+    background-color: #111725;
+  }
+}
+::v-deep .relinputStatus-4{
+  .el-input__inner{
+    color: #D9001B;
+    background-color: #111725;
+  }
+}
 .propFormClass{
   .el-form-item{
     margin-bottom: 5px;
   }
+}
+::v-deep .el-upload-list--picture-card .el-upload-list__item{
+  width: 70px;
+  height: 70px;
+}
+::v-deep .el-upload--picture-card{
+  width: 70px;
+  height: 70px;
+  line-height: 80px;
 }
 </style>
