@@ -138,30 +138,92 @@
                   </el-form>
                 </div>
                 <div v-for="(form, index) in propForm" :key="form.index">
-                  <!-- <div v-if="form.editing">
-                    <el-form :model="form" ref="form">
-                      <el-form-item>  
-                        <el-input v-model="form[item.engName]" style="width: 250px;"></el-input>  
-                      </el-form-item>  
-                    </el-form> 
-                  </div> -->
-                  <div >
+                  <div v-if="form.editing">
+                    <el-form :model="form" ref="form" class="propFormClass" label-width="80px">
+                      <div v-if="form.dataType === 'PICTURE'">
+                        <el-form-item :label="form.name">
+                            <el-upload
+                              action="#"
+                              list-type="picture-card"
+                              :on-preview="handlePictureCardPreview"
+                              :auto-upload="false"
+                              :on-remove="handleRemove" style="display: inline-block;margin-left: 20px;">
+                              <i class="el-icon-plus"></i>
+                            </el-upload>
+                        </el-form-item>
+                      </div>
+                      <div v-else>
+                        <el-form-item :label="form.name" style="position: relative;">
+                          <div v-for="item in form.propertyAlias" style="color: #F59A23;font-size: 12px;position: absolute;left: -60px;top: -20px;">
+                            <span @click="aliasSearchFunction(item)" style="cursor: pointer;">{{ item }}</span>
+                          </div>
+                          <div v-for="(form1,index1) in form.propertyValueList" :key="index1" style="display:inline-block">
+                            <el-form :model="form1" ref="form1" class="propFormClass">
+                                  <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedTextObject(index,index1)">
+                                  <el-input v-model="form1.object" style="width: 150px;display: inline-block;"></el-input>
+                                  <el-button v-if="index1==0" type="primary" size="mini"  style="background-color: #169BD5;text-align: center;margin-left: 10px;" @click="addPropFormValueItem(index)">添加值</el-button>
+                                  <el-button v-if="index1==0" type="primary" size="mini"  style="background-color: #00BFBF;text-align: center;margin-left: 10px;" @click="addFormValueAliasInput(index)">添加别名</el-button>
+                                  <span v-if="index1==0" @click="saveTripletPropValueList(index)" style="cursor:pointer;margin-left: 10px;color: #D7D7D7;font-size: 14px;">暂存</span>
+                                  <span v-if="index1==0" @click="cancelEditPropFunction(index)" style="cursor:pointer;margin-left: 10px;color: #D7D7D7;font-size: 14px;">取消</span>
+                                  <span v-if="index1==0" @click="cancelEditPropFunction(index)" style="cursor:pointer;margin-left: 10px;color: #D7D7D7;font-size: 14px;">清除</span>
+                              <el-form-item>
+                                <label @click="handleTextLabelClick(index,index1)" style="display: inline-block;margin-right: 10px;cursor: pointer;color: white;">文本</label>
+                                <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedText(index,index1)">
+                                <el-input v-model="form1.tripleText" style="width: 250px;"></el-input>
+                              </el-form-item>
+                              <el-form-item>
+                                <label style="display: inline-block;margin-right: 10px;cursor: pointer;color: white;">备注</label>
+                                <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedTextComment(index,index1)">
+                                <el-input v-model="form1.comment" style="width: 250px;"></el-input>
+                              </el-form-item>
+                            </el-form>
+                          </div>
+                          <div v-for="(aliasform,index4) in form.propertyAlias" :key="index">
+                            <label style="display: inline-block;margin-right: 10px;cursor: pointer;color: white;">属性别名</label>
+                            <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedTextAlias(index,index4)">
+                            <el-input v-model="form.propertyAlias[index4]" style="width: 250px;"></el-input>
+                            <!-- <span @click="addPropFormValueListAlias(index,index4)" style="cursor:pointer;margin-left: 10px;color: #D7D7D7;font-size: 14px;">添加</span> -->
+                            <span @click="deletePropFormValueListAlias(index,index4)" style="cursor:pointer;margin-left: 10px;color: #D7D7D7;font-size: 14px;">删除</span>
+                          </div>
+                        </el-form-item>
+                      </div>
+                    </el-form>
+                  </div>
+                  <div v-else>
                     <el-form :model="form" ref="form" class="propFormClass">
                       <div v-if="form.dataType !== 'PICTURE'">
-                        <el-form-item>
-                          <label  @click="handleCustomLabelClick(index)" style="width: 70px;text-align: right;display: inline-block;margin-right: 35px;cursor: pointer;">{{form.name}}</label>
-                          <span v-if="form.propertyValueList" style="margin-right: 15px" :class="getStatusClass2(index)">{{form.propertyValueList[0].object}}</span>
-                          <span v-if="form.propertyValueList && form.isEnsure == 0 && form.isExtract" style="cursor: pointer;" @click="propConfirmFunction(index)">[确定]</span>
-                          <span v-if="form.propertyValueList && form.isEnsure == 1 && form.isExtract" style="cursor: pointer;color:#FFFF00" @click="propCancelFunction(index)">[取消]</span>
-                          <span v-if="form.propertyValueList && form.missingText && form.isExtract" style="color:#C280FF;margin-left:15px">[待填写文本]</span>
-                        </el-form-item>
-                        <!-- <el-form-item>
-                          <span>{{ form.dataType }}</span>
-                        </el-form-item> -->
-                        <el-form-item label="文本" class="teshu1">
-                          <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedText(index)">
-                          <el-input v-model="form.text" style="width: 250px;" :disabled="form.isEnsure == 1" :class="getStatusClass3(index)"></el-input>
-                        </el-form-item>
+                        <div v-if="form.propertyValueList.length">
+                          <div v-for="(form2,index2) in form.propertyValueList" :key="index2">
+                            <el-form :model="form2" ref="form" class="propFormClass">
+                              <el-form-item style="position: relative">
+                                <div v-for="item in form.propertyAlias" style="color: #F59A23;font-size: 12px;position: absolute;left: 40px;top: -20px;z-index: 1111;">
+                                  <span @click="aliasSearchFunction(item)" style="cursor: pointer;">{{ item }}</span>
+                                </div>
+                                <label v-if="index2 == 0" @click="handleCustomLabelClick(index)" style="width: 70px;text-align: right;display: inline-block;margin-right: 35px;cursor: pointer;">{{form.name}}</label>
+                                <label v-if="index2 != 0" @click="handleCustomLabelClick(index)" style="width: 70px;text-align: right;display: inline-block;margin-right: 35px;cursor: pointer;"></label>
+                                <span v-if="form.propertyValueList" style="margin-right: 15px" :class="getStatusClass2(index)">{{form2.object}}</span>
+                                <span v-if="form.propertyValueList && form.isEnsure == 0 && form.isExtract && index2 == 0" style="cursor: pointer;" @click="propConfirmFunction(index)">[确定]</span>
+                                <span v-if="form.propertyValueList && form.isEnsure == 1 && form.isExtract && index2 == 0" style="cursor: pointer;color:#FFFF00" @click="propCancelFunction(index)">[取消]</span>
+                                <span v-if="form.propertyValueList && form.missingText && form.isExtract && index2 == 0" style="color:#C280FF;margin-left:15px">[待填写文本]</span>
+                              </el-form-item>
+                              <el-form-item>
+                                <label @click="handleTextLabelClick(index,index2)" style="width: 70px;text-align: right;display: inline-block;margin-right: 10px;cursor: pointer;color: white;">文本</label>
+                                <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedText(index,index2)">
+                                <el-input v-model="form2.tripleText" style="width: 250px;" :disabled="form.isEnsure == 1" :class="getStatusClass3(index)"></el-input>
+                              </el-form-item>
+                            </el-form> 
+                          </div>
+                        </div>
+                          <div v-else>
+                            <el-form-item>
+                                <label  @click="handleCustomLabelClick(index)" style="width: 70px;text-align: right;display: inline-block;margin-right: 35px;cursor: pointer;">{{form.name}}</label>
+                              </el-form-item>
+                              <el-form-item>
+                                <label  @click="handleTextLabelClickSingle(index)" style="width: 70px;text-align: right;display: inline-block;margin-right: 10px;cursor: pointer;color: white;">文本</label>
+                                <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedTextSingle(index)">
+                                <el-input v-model="form.tripleText" style="width: 250px;" :disabled="form.isEnsure == 1" :class="getStatusClass3(index)"></el-input>
+                              </el-form-item>
+                          </div>
                       </div>
                       <div v-else>
                         <el-form-item>
@@ -176,14 +238,6 @@
                               <i class="el-icon-picture-outline"></i>
                             </div>
                           </el-image>
-                          <el-upload
-                            action="#"
-                            list-type="picture-card"
-                            :on-preview="handlePictureCardPreview"
-                            :auto-upload="false"
-                            :on-remove="handleRemove" style="display: inline-block;">
-                            <i class="el-icon-plus"></i>
-                          </el-upload>
                         </el-form-item>
                       </div>
                     </el-form> 
@@ -397,6 +451,7 @@ export default {
         searchQuery: '',
         highlightedContent: '',  
         regularText:'规范1',
+        nowhuaciPropIndexInner:'',
         innerVisible:false,
         labelPosition:'right',
         nowlabelEntityName:'',
@@ -663,18 +718,63 @@ export default {
           // 停止监听鼠标抬起事件
       document.removeEventListener('mouseup', this.handleTextSelection);
     },
-    getPropListSelectedText(index){
+    getPropListSelectedText(index,index1){
       this.nowhuaciPropIndex = index
+      this.nowhuaciPropIndexInner = index1
       document.addEventListener('mouseup', this.handleTextSelectionPropText);
     },
+    getPropListSelectedTextComment(index,index1){
+      this.nowhuaciPropIndex = index
+      this.nowhuaciPropIndexInner = index1
+      document.addEventListener('mouseup', this.handleTextSelectionPropTextComment);
+    },
+    getPropListSelectedTextObject(index,index1){
+      this.nowhuaciPropIndex = index
+      this.nowhuaciPropIndexInner = index1
+      document.addEventListener('mouseup', this.handleTextSelectionPropTextObject);
+    },
+    getPropListSelectedTextSingle(index){
+      this.nowhuaciPropIndex = index
+      document.addEventListener('mouseup', this.handleTextSelectionPropTextSingle);
+    },
+    handleTextSelectionPropTextSingle(){
+      const selectedText = window.getSelection().toString();
+      console.log(this.nowhuaciPropIndex,this.nowhuaciPropIndexInner)
+      if (selectedText) {
+        this.propForm[this.nowhuaciPropIndex].tripleText= selectedText + ' ' ;
+      }
+          // 停止监听鼠标抬起事件
+      document.removeEventListener('mouseup', this.handleTextSelectionPropTextSingle);
+    }, 
+    handleTextSelectionPropTextObject(){
+      const selectedText = window.getSelection().toString();
+      console.log(this.nowhuaciPropIndex,this.nowhuaciPropIndexInner)
+      if (selectedText) {
+        this.propForm[this.nowhuaciPropIndex].propertyValueList[this.nowhuaciPropIndexInner].object= selectedText + ' ' ;
+      }
+          // 停止监听鼠标抬起事件
+      document.removeEventListener('mouseup', this.handleTextSelectionPropTextObject);
+    }, 
+    handleTextSelectionPropTextComment(){
+      const selectedText = window.getSelection().toString();
+      console.log(this.nowhuaciPropIndex,this.nowhuaciPropIndexInner)
+      if (selectedText) {
+        this.propForm[this.nowhuaciPropIndex].propertyValueList[this.nowhuaciPropIndexInner].comment= selectedText + ' ' ;
+      }
+          // 停止监听鼠标抬起事件
+      document.removeEventListener('mouseup', this.handleTextSelectionPropTextComment);
+    }, 
     handleTextSelectionPropText(){
       const selectedText = window.getSelection().toString();
-      console.log(selectedText)
+      console.log(this.nowhuaciPropIndex,this.nowhuaciPropIndexInner)
       if (selectedText) {
-        this.$set(this.propForm, this.nowhuaciPropIndex, { ...this.propForm[this.nowhuaciPropIndex], text: selectedText + ' ' });
+        this.propForm[this.nowhuaciPropIndex].propertyValueList[this.nowhuaciPropIndexInner].tripleText= selectedText + ' ' ;
       }
           // 停止监听鼠标抬起事件
       document.removeEventListener('mouseup', this.handleTextSelectionPropText);
+    },
+    deletePropFormValueListAlias(index,index1){
+      this.propForm[index].propertyAlias.splice(index1, 1)
     },
     remoteMethodEntityList(query){
       console.log(this.nowremoteIndex)
@@ -770,7 +870,7 @@ export default {
       let params ={
         idAndTextList:[{
           id:this.propForm[index].propertyValueList[0].id,
-          tripleText:this.propForm[index].text
+          tripleText:this.propForm[index].tripleText
         }],
         isEnsure:1
       }
@@ -853,19 +953,19 @@ export default {
       getPropList(params).then(res=>{
           dataList = res.data
           this.propForm = []
-          dataList.forEach(item => {
-            this.propForm.push({
+          this.propForm = dataList.map(item => ({
               id: item.id,
-              text:item.tripleText,
+              tripleText:'',
               editing: false,
               name:item.name,
-              propertyValueList:item.propertyValueList,
+              propertyValueList: item.propertyValueList !== null? item.propertyValueList:[],
               isEnsure:item.isEnsure,
               isExtract:item.isExtract,
               dataType:item.dataType,
-              missingText:this.getMissingText(item)
-          });
-        });
+              missingText:this.getMissingText(item),
+              object:'',
+              propertyAlias: item.propertyAlias !== null? item.propertyAlias:[]
+          }));
       })
     },
     submitForm(formName) {
@@ -1011,6 +1111,13 @@ export default {
       delete this.addEntityForm.entityType;
       this.selfdefine = !this.selfdefine
     },
+    getText(item){
+      if(item.propertyValueList){
+        return item.propertyValueList[0].tripleText
+      }else{
+        return ''
+      }
+    },
     getNameRegualation(){
       console.log(this.addEntityForm.entityType)
       console.log(this.nowlabelEntityType)
@@ -1020,6 +1127,9 @@ export default {
         this.$message.error('请先选择实例类型！')
         return false
       }
+    },
+    addFormValueAliasInput(index) {
+      this.propForm[index].propertyAlias.push('');  // 在数组中添加一个新的空字符串
     },
     aliasFindHighLight(data){
       this.searchQuery = data
@@ -1074,6 +1184,37 @@ export default {
         }
       })
     },
+    saveTripletPropValueList(index){
+      let saveTripletReqListTemp = []
+      this.propForm[index].propertyValueList.forEach(item => {
+        saveTripletReqListTemp.push({
+            id:item.id,
+            comment:item.comment,
+            object:item.object,
+            predicate:this.propForm[index].name,
+            predicateType:1,
+            isEnsure:this.propForm[index].isEnsure,
+            subject:this.nowlabelEntityName,
+            tripleText:item.tripleText,
+            predicateAlias:this.propForm[index].propertyAlias
+          });
+      })
+      let params = {
+        docInfoReq:{
+          docId:this.params.articleId,
+          docStatus:this.params.docStatus,
+          docType:this.params.docType,
+          uuid:this.nowEditEntityId,
+          dataType:this.nowlabelEntityType
+        },
+        saveTripletReqList:saveTripletReqListTemp
+      }
+      saveTriplets(params).then(res=>{
+        if(res.code == 200){
+          this.$set(this.propForm, index, { ...this.propForm[index], editing: false });
+        }
+      })
+    },
     isEditEntityName(){
       // getEntityNameByEntityType
       this.isEditEntityName1 = false
@@ -1081,10 +1222,28 @@ export default {
       this.dialogFormVisible =true
     },
     handleCustomLabelClick(index){
-      this.$set(this.propForm, index, {
-        ...this.propForm,
-        editing: true
-      });
+      this.$set(this.propForm, index, { ...this.propForm[index], editing: true });
+      if (this.propForm[index].propertyValueList.length === 0) {
+        this.propForm[index].propertyValueList.push({ object: '', tripleText: '',comment:'' });
+      }
+    },
+    addPropFormValueItem(index){
+      this.propForm[index].propertyValueList.push({ object: '', tripleText: '',comment:'' });
+    },
+    cancelEditPropFunction(index){
+      this.$set(this.propForm, index, { ...this.propForm[index], editing: false });
+    },
+    handleTextLabelClick(index,index1){
+      this.searchQuery = this.propForm[index].propertyValueList[index1].tripleText
+      this.highlightText()
+    },
+    handleTextLabelClickSingle(index){
+      this.searchQuery = this.propForm[index].tripleText
+      this.highlightText()
+    },
+    aliasSearchFunction(text){
+      this.searchQuery = text
+      this.highlightText()
     },
     getSelectedText(index) {
       let selectedText = '';
@@ -1314,12 +1473,6 @@ export default {
   .el-form-item__content{
     margin-left: 70px !important
   }
-}
-::v-deep .teshu1{
-  .el-form-item__label{
-    color: white !important;
-  }
-  margin-left: 40px
 }
 .relStatus-1{
   color: #95F204;
