@@ -143,29 +143,38 @@
                       <div v-if="form.dataType === 'PICTURE'">
                         <el-form-item :label="form.name">
                             <el-upload
-                              action="#"
+                              action="http://localhost:8081/proofread/uploadImg"
                               list-type="picture-card"
                               :on-preview="handlePictureCardPreview"
-                              :auto-upload="false"
-                              :on-remove="handleRemove" style="display: inline-block;margin-left: 20px;">
+                              :on-remove="handleRemove" 
+                              :on-success="(response, file, fileList) => handleSuccess(response, file, fileList, index)"
+                              :file-list="form.fileList"
+                              style="display: inline-block;margin-left: 20px;"
+                              >
                               <i class="el-icon-plus"></i>
                             </el-upload>
                         </el-form-item>
                       </div>
                       <div v-else>
                         <el-form-item :label="form.name" style="position: relative;">
-                          <div v-for="item in form.propertyAlias" style="color: #F59A23;font-size: 12px;position: absolute;left: -60px;top: -20px;">
+                          <div v-for="(item,indexAlisa) in form.propertyAlias" :key="indexAlisa" style="color: #F59A23;font-size: 12px;position: absolute;left: -60px;top: -20px;">
                             <span @click="aliasSearchFunction(item)" style="cursor: pointer;">{{ item }}</span>
                           </div>
-                          <div v-for="(form1,index1) in form.propertyValueList" :key="index1" style="display:inline-block">
+                          <div v-for="(form1,index1) in form.propertyValueList" :key="'form1-' + index1">
                             <el-form :model="form1" ref="form1" class="propFormClass">
                                   <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedTextObject(index,index1)">
                                   <el-input v-model="form1.object" style="width: 150px;display: inline-block;"></el-input>
+                                  <el-select v-if="form.unit.length && !form1.isCustomUnit" v-model="form1.chosenUnit" style="width: 85px;margin-left: 15px;" size="mini"> 
+                                      <el-option v-for="item in form.unit" :key="item" :label="item" :value="item"></el-option>
+                                  </el-select>
+                                  <el-input v-if="form.unit.length && form1.isCustomUnit" v-model="form1.chosenUnit" style="width: 85px;display: inline-block;margin-left: 15px;"></el-input>
+                                  <el-button v-if="form.unit.length && !form1.isCustomUnit" type="primary" size="mini"  style="background-color: #F59A23; border-color: #F59A23; text-align: center;margin-left: 10px;" @click="form1.isCustomUnit = true">自定义单位</el-button>
+                                  <el-button v-if="form.unit.length && form1.isCustomUnit" type="primary" size="mini"  style="background-color: #F59A23;border-color: #F59A23;text-align: center;margin-left: 10px;" @click="form1.isCustomUnit = false">取消</el-button>
                                   <el-button v-if="index1==0" type="primary" size="mini"  style="background-color: #169BD5;text-align: center;margin-left: 10px;" @click="addPropFormValueItem(index)">添加值</el-button>
                                   <el-button v-if="index1==0" type="primary" size="mini"  style="background-color: #00BFBF;text-align: center;margin-left: 10px;" @click="addFormValueAliasInput(index)">添加别名</el-button>
                                   <span v-if="index1==0" @click="saveTripletPropValueList(index)" style="cursor:pointer;margin-left: 10px;color: #D7D7D7;font-size: 14px;">暂存</span>
                                   <span v-if="index1==0" @click="cancelEditPropFunction(index)" style="cursor:pointer;margin-left: 10px;color: #D7D7D7;font-size: 14px;">取消</span>
-                                  <span v-if="index1==0" @click="cancelEditPropFunction(index)" style="cursor:pointer;margin-left: 10px;color: #D7D7D7;font-size: 14px;">清除</span>
+                                  <span v-if="index1==0" @click="clearEditPropFunction(index)" style="cursor:pointer;margin-left: 10px;color: #D7D7D7;font-size: 14px;">清除</span>
                               <el-form-item>
                                 <label @click="handleTextLabelClick(index,index1)" style="display: inline-block;margin-right: 10px;cursor: pointer;color: white;">文本</label>
                                 <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedText(index,index1)">
@@ -178,7 +187,7 @@
                               </el-form-item>
                             </el-form>
                           </div>
-                          <div v-for="(aliasform,index4) in form.propertyAlias" :key="index">
+                          <div v-for="(aliasform,index4) in form.propertyAlias" :key="'aliasform-' + index4">
                             <label style="display: inline-block;margin-right: 10px;cursor: pointer;color: white;">属性别名</label>
                             <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedTextAlias(index,index4)">
                             <el-input v-model="form.propertyAlias[index4]" style="width: 250px;"></el-input>
@@ -196,7 +205,7 @@
                           <div v-for="(form2,index2) in form.propertyValueList" :key="index2">
                             <el-form :model="form2" ref="form" class="propFormClass">
                               <el-form-item style="position: relative">
-                                <div v-for="item in form.propertyAlias" style="color: #F59A23;font-size: 12px;position: absolute;left: 40px;top: -20px;z-index: 1111;">
+                                <div v-for="(item,indexalisa1) in form.propertyAlias" :key="indexalisa1" style="color: #F59A23;font-size: 12px;position: absolute;left: 40px;top: -20px;z-index: 1111;">
                                   <span @click="aliasSearchFunction(item)" style="cursor: pointer;">{{ item }}</span>
                                 </div>
                                 <label v-if="index2 == 0" @click="handleCustomLabelClick(index)" style="width: 70px;text-align: right;display: inline-block;margin-right: 35px;cursor: pointer;">{{form.name}}</label>
@@ -439,6 +448,7 @@ export default {
           entityName:'',
           text:''
         },
+        propFormDataTemp:[],
         dialogImageUrl:'',
         disabled:false,
         nowEditEntityId:'',
@@ -737,6 +747,20 @@ export default {
       this.nowhuaciPropIndex = index
       document.addEventListener('mouseup', this.handleTextSelectionPropTextSingle);
     },
+    getPropListSelectedTextAlias(index,index1){
+      this.nowhuaciPropIndex = index
+      this.nowhuaciPropIndexInner = index1
+      document.addEventListener('mouseup', this.handleTextSelectionPropAlias);
+    },
+    handleTextSelectionPropAlias(){
+      const selectedText = window.getSelection().toString();
+      if (selectedText) {
+        this.propForm[this.nowhuaciPropIndex].propertyAlias[this.nowhuaciPropIndexInner]= selectedText + ' ' ;
+      }
+          // 停止监听鼠标抬起事件
+      document.removeEventListener('mouseup', this.handleTextSelectionPropAlias);
+      this.$forceUpdate()
+    },
     handleTextSelectionPropTextSingle(){
       const selectedText = window.getSelection().toString();
       console.log(this.nowhuaciPropIndex,this.nowhuaciPropIndexInner)
@@ -870,7 +894,7 @@ export default {
       let params ={
         idAndTextList:[{
           id:this.propForm[index].propertyValueList[0].id,
-          tripleText:this.propForm[index].tripleText
+          tripleText:this.propForm[index].propertyValueList[0].tripleText
         }],
         isEnsure:1
       }
@@ -964,9 +988,25 @@ export default {
               dataType:item.dataType,
               missingText:this.getMissingText(item),
               object:'',
-              propertyAlias: item.propertyAlias !== null? item.propertyAlias:[]
+              propertyAlias: item.propertyAlias !== null? item.propertyAlias:[],
+              unit: item.unit !==null? item.unit:[],
+              fileList:[]
           }));
+          this.propFormDataTemp =JSON.parse(JSON.stringify(dataList.map(item => ({
+              id: item.id,
+              tripleText:'',
+              editing: false,
+              name:item.name,
+              propertyValueList: item.propertyValueList !== null? item.propertyValueList:[],
+              isEnsure:item.isEnsure,
+              isExtract:item.isExtract,
+              dataType:item.dataType,
+              missingText:this.getMissingText(item),
+              object:'',
+              propertyAlias: item.propertyAlias !== null? item.propertyAlias:[]
+          })))) 
       })
+      console.log(this.propFormDataTemp)
     },
     submitForm(formName) {
       console.log(this.addEntityForm.entityName)
@@ -1012,9 +1052,36 @@ export default {
         }
     },
     handlePictureCardPreview(file) {
-      console.log(file)
         this.dialogImageUrl = file.url;
         this.imageDialogVisible = true;
+    },
+    handleSuccess(response, file, fileList, index) {
+      this.propForm[index].fileList = fileList;
+      let saveTripletReqListTemp = []
+      this.propForm[index].propertyValueList.forEach(item => {
+        saveTripletReqListTemp.push({
+            object:response.data,
+            predicate:this.propForm[index].name,
+            predicateType:1,
+            subject:this.nowlabelEntityName,
+            tripleText:"PITCTUE"
+          });
+      })
+      let params = {
+        docInfoReq:{
+          docId:this.params.articleId,
+          docStatus:this.params.docStatus,
+          docType:this.params.docType,
+          uuid:this.nowEditEntityId,
+          dataType:this.nowlabelEntityType
+        },
+        saveTripletReqList:saveTripletReqListTemp
+      }
+      saveTriplets(params).then(res=>{
+        if(res.code == 200){
+            this.$message.success('上传成功！')
+        }
+      })
     },
     getEntityNameByEntityTypeFunction(){
       let params = {
@@ -1060,6 +1127,12 @@ export default {
         'relStatus-3': this.relforms[index].isAbstact == false,
         'relStatus-4': this.relforms[index].isqueding == 2 && this.relforms[index].isAbstact == true,
       };
+    },
+    clearEditPropFunction(index){
+      console.log(this.propFormDataTemp[index])
+        for(let i =0;i<this.propForm[index].propertyValueList.length;i++){
+          this.$set(this.propForm[index].propertyValueList, i, { ...this.propForm[index].propertyValueList[i], object:'',tripleText:'',comment:'' });
+        }
     },
     getStatusClass2(index) {
       return {
@@ -1129,7 +1202,7 @@ export default {
       }
     },
     addFormValueAliasInput(index) {
-      this.propForm[index].propertyAlias.push('');  // 在数组中添加一个新的空字符串
+      this.$set(this.propForm[index].propertyAlias, this.propForm[index].propertyAlias.length, '');
     },
     aliasFindHighLight(data){
       this.searchQuery = data
@@ -1145,11 +1218,8 @@ export default {
 
     },
     handleRemove(file) {
-        console.log(file);
-      },
-      handleDownload(file) {
-        console.log(file);
-      },
+
+    },
     saveAllRelation(){
       let saveTripletReqListTemp = []
       this.relforms.forEach(item => {
@@ -1196,7 +1266,8 @@ export default {
             isEnsure:this.propForm[index].isEnsure,
             subject:this.nowlabelEntityName,
             tripleText:item.tripleText,
-            predicateAlias:this.propForm[index].propertyAlias
+            predicateAlias:this.propForm[index].propertyAlias,
+            unit:item.chosenUnit
           });
       })
       let params = {
@@ -1212,6 +1283,9 @@ export default {
       saveTriplets(params).then(res=>{
         if(res.code == 200){
           this.$set(this.propForm, index, { ...this.propForm[index], editing: false });
+          for(let i =0;i<res.data.length;i++){
+            this.$set(this.propForm[index].propertyValueList, i, { ...this.propForm[index].propertyValueList[i], id: res.data[i] });
+          }  
         }
       })
     },
@@ -1224,13 +1298,19 @@ export default {
     handleCustomLabelClick(index){
       this.$set(this.propForm, index, { ...this.propForm[index], editing: true });
       if (this.propForm[index].propertyValueList.length === 0) {
-        this.propForm[index].propertyValueList.push({ object: '', tripleText: '',comment:'' });
+        this.propForm[index].propertyValueList.push({ object: '', tripleText: '',comment:'',isCustomUnit:false });
       }
     },
     addPropFormValueItem(index){
-      this.propForm[index].propertyValueList.push({ object: '', tripleText: '',comment:'' });
+      this.propForm[index].propertyValueList.push({ object: '', tripleText: '',comment:'',isCustomUnit:false });
+      this.$forceUpdate()
     },
     cancelEditPropFunction(index){
+      if(this.propFormDataTemp[index].propertyValueList){
+        this.$set(this.propForm, index, { ...this.propForm[index], propertyValueList:JSON.parse(JSON.stringify(this.propFormDataTemp[index].propertyValueList)) });
+      }else{
+        this.$set(this.propForm, index, { ...this.propForm[index], propertyValueList:[] });
+      }
       this.$set(this.propForm, index, { ...this.propForm[index], editing: false });
     },
     handleTextLabelClick(index,index1){
