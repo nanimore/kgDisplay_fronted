@@ -146,13 +146,24 @@
                               action="http://localhost:8081/proofread/uploadImg"
                               list-type="picture-card"
                               :on-preview="handlePictureCardPreview"
-                              :on-remove="handleRemove" 
+                              :on-remove="(file, fileList) => handleRemove(file, fileList, index)" 
                               :on-success="(response, file, fileList) => handleSuccess(response, file, fileList, index)"
                               :file-list="form.fileList"
+                              :before-upload="beforeUpload"
                               style="display: inline-block;margin-left: 20px;"
                               >
                               <i class="el-icon-plus"></i>
                             </el-upload>
+                            <el-button type="primary" size="mini"  style="background-color: #00BFBF;text-align: center;margin-left: 10px;" @click="addFormValueAliasInput(index)">添加别名</el-button>
+                            <span @click="saveTripletPropValueListImage(index)" style="cursor:pointer;margin-left: 10px;color: #D7D7D7;font-size: 14px;">暂存</span>
+                            <span @click="handleCancelImageEdit(index)" style="margin-left: 15px;cursor: pointer;">取消</span>
+                            <div v-for="(aliasform,index4) in form.propertyAlias" :key="'aliasform-' + index4">
+                              <label style="display: inline-block;margin-right: 10px;cursor: pointer;color: white;">属性别名</label>
+                              <img src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedTextAlias(index,index4)">
+                              <el-input v-model="form.propertyAlias[index4]" style="width: 250px;"></el-input>
+                              <!-- <span @click="addPropFormValueListAlias(index,index4)" style="cursor:pointer;margin-left: 10px;color: #D7D7D7;font-size: 14px;">添加</span> -->
+                              <span @click="deletePropFormValueListAlias(index,index4)" style="cursor:pointer;margin-left: 10px;color: #D7D7D7;font-size: 14px;">删除</span>
+                            </div>
                         </el-form-item>
                       </div>
                       <div v-else>
@@ -235,18 +246,17 @@
                           </div>
                       </div>
                       <div v-else>
-                        <el-form-item>
-                          <label  @click="handleCustomLabelClick(index)" style="width: 70px;text-align: right;display: inline-block;margin-right: 35px;cursor: pointer;">{{form.name}}</label>
-                          <el-image 
-                            style="width: 100px; height: 100px"
-                            v-for="url in form.imageList" 
-                            :key="url"
-                            :src="url" 
-                            :preview-src-list="imageList">
-                            <div slot="error" class="image-slot">
-                              <i class="el-icon-picture-outline"></i>
+                        <el-form-item class="pictureFormitem">
+                          <label  @click="handleCustomLabelClick(index)" style="width: 70px;text-align: right;margin-right: 35px;cursor: pointer;">{{form.name}}</label>
+                          <div style="display: flex;justify-content: flex-start;flex-wrap:wrap;flex:1">
+                            <div v-for="url in form.fileList" :key="url.uid" style="margin-right: 10px;">
+                              <el-image
+                                v-if="form.picturePathList"
+                                style="width: 80px; height: 80px"
+                                :src="url.url">
+                              </el-image>
                             </div>
-                          </el-image>
+                          </div>  
                         </el-form-item>
                       </div>
                     </el-form> 
@@ -720,6 +730,14 @@ export default {
     startSelecting() {
       document.addEventListener('mouseup', this.handleTextSelection);
     },
+    beforeUpload(file) {
+      const isImageOrVideo = file.type.startsWith('image/') || file.type.startsWith('video/');
+      if (!isImageOrVideo) {
+        this.$message.error('只能上传图片或视频文件');
+        return false;
+      }
+      return true;
+    },
     handleTextSelection() {
       const selectedText = window.getSelection().toString();
       if (selectedText) {
@@ -820,6 +838,11 @@ export default {
         } else {
           this.$set(this.relforms, this.nowremoteIndex, { ...this.relforms[this.nowremoteIndex], entityNameListbyRel: [] });;
         }
+    },
+    getPicturePathList(picturePathList) {
+      console.log(typeof(picturePathList))
+      const baseUrl = 'http://localhost:8081';
+      return picturePathList.map(path => baseUrl + path);
     },
     enterProp(item){
       this.isDetail = false
@@ -990,7 +1013,8 @@ export default {
               object:'',
               propertyAlias: item.propertyAlias !== null? item.propertyAlias:[],
               unit: item.unit !==null? item.unit:[],
-              fileList:[]
+              fileList:item.propertyValueList!==null?this.getPicturePathList1(item.propertyValueList):[],
+              picturePathList:item.picturePathList
           }));
           this.propFormDataTemp =JSON.parse(JSON.stringify(dataList.map(item => ({
               id: item.id,
@@ -1056,17 +1080,15 @@ export default {
         this.imageDialogVisible = true;
     },
     handleSuccess(response, file, fileList, index) {
+      console.log(fileList)
       this.propForm[index].fileList = fileList;
       let saveTripletReqListTemp = []
-      this.propForm[index].propertyValueList.forEach(item => {
-        saveTripletReqListTemp.push({
-            object:response.data,
-            predicate:this.propForm[index].name,
-            predicateType:1,
-            subject:this.nowlabelEntityName,
-            tripleText:"PITCTUE"
-          });
-      })
+      saveTripletReqListTemp.push({
+          object:response.data,
+          predicate:this.propForm[index].name,
+          predicateType:1,
+          subject:this.nowlabelEntityName,
+      });
       let params = {
         docInfoReq:{
           docId:this.params.articleId,
@@ -1080,6 +1102,16 @@ export default {
       saveTriplets(params).then(res=>{
         if(res.code == 200){
             this.$message.success('上传成功！')
+            this.propForm[index].fileList[this.propForm[index].fileList.length-1].uid = res.data[0];
+            this.propForm[index].fileList[this.propForm[index].fileList.length-1].url = 'http://localhost:8081'+response.data;
+            this.propForm[index].propertyValueList.push({
+                id:file.uid,
+                object:response.data,
+                predicate:this.propForm[index].name,
+                predicateType:1,
+                subject:this.nowlabelEntityName,
+                propertyAlias:this.propForm[index].propertyAlias
+            });
         }
       })
     },
@@ -1108,6 +1140,14 @@ export default {
       }else{
         return false
       }
+    },
+    getPicturePathList1(data){
+      const baseUrl = 'http://localhost:8081';
+      let dataTemp = data.map((file, index) => ({
+              uid: file.id, // 使用 index 或其他唯一标识符作为 uid
+              url: baseUrl + file.object,
+      }));
+      return dataTemp;
     },
     getStatusClass(status) {
       return {
@@ -1217,8 +1257,42 @@ export default {
     saveAllPropertie(){
 
     },
-    handleRemove(file) {
-
+    handleCancelImageEdit(index){
+      this.$set(this.propForm, index, { ...this.propForm[index], editing: false });
+      console.log(this.propForm[index].fileList)
+    },
+    handleRemove(file, fileList, index){
+      console.log(file)
+      if (file.status === "success") {
+        let saveTripletReqListTemp = []
+      saveTripletReqListTemp.push({
+          id:file.uid,
+          object:'',
+          predicate:this.propForm[index].name,
+          predicateType:1,
+          subject:this.nowlabelEntityName,
+      });
+      let params = {
+        docInfoReq:{
+          docId:this.params.articleId,
+          docStatus:this.params.docStatus,
+          docType:this.params.docType,
+          uuid:this.nowEditEntityId,
+          dataType:this.nowlabelEntityType
+        },
+        saveTripletReqList:saveTripletReqListTemp
+      }
+      saveTriplets(params).then(res=>{
+        console.log(this.propForm[index])
+        if(res.code == 200){
+            this.$message.success('删除成功！')
+            const index1 = this.propForm[index].fileList.findIndex(item => item.Uid === file.uid);
+            if (index !== -1) {
+              this.propForm[index].fileList.splice(index1, 1);
+            }
+        }
+      })
+      }
     },
     saveAllRelation(){
       let saveTripletReqListTemp = []
@@ -1251,6 +1325,34 @@ export default {
           this.isDetail = true
           this.getEntityListFunction()
           this.nowEditEntityId = ''
+        }
+      })
+    },
+    saveTripletPropValueListImage(index){
+      let saveTripletReqListTemp = []
+      this.propForm[index].propertyValueList.forEach(item => {
+        saveTripletReqListTemp.push({
+            id:item.id,
+            object:item.object,
+            predicate:this.propForm[index].name,
+            predicateType:1,
+            subject:this.nowlabelEntityName,
+            predicateAlias:this.propForm[index].propertyAlias,
+          });
+      })
+      let params = {
+        docInfoReq:{
+          docId:this.params.articleId,
+          docStatus:this.params.docStatus,
+          docType:this.params.docType,
+          uuid:this.nowEditEntityId,
+          dataType:this.nowlabelEntityType
+        },
+        saveTripletReqList:saveTripletReqListTemp
+      }
+      saveTriplets(params).then(res=>{
+        if(res.code == 200){
+          this.$set(this.propForm, index, { ...this.propForm[index], editing: false });
         }
       })
     },
@@ -1339,7 +1441,6 @@ export default {
     }
   },
   computed: {
-    
   },
 };
 </script>
@@ -1385,7 +1486,11 @@ export default {
   border-radius: 15px;
   padding: 2px 5px;
 }
-
+::v-deep .pictureFormitem{
+  .el-form-item__content{
+    display:flex
+  }
+}
 .newListDetailContainer{
   display: flex;
   padding: 30px;
