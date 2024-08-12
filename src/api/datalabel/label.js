@@ -196,3 +196,10 @@ import request from '@/utils/request'
       data: query,
     })
   }
+  export function submitReview(query) {
+    return request({
+      url: '/proofread/submit',
+      method: 'post',
+      data: query,
+    })
+  }

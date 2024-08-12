@@ -98,41 +98,41 @@
                     </template>
                     <el-submenu index="4-1">
                         <template slot="title">媒体数据</template>
-                        <el-menu-item index="4-1-1">全部</el-menu-item>
-                        <el-menu-item index="4-1-2">舰船</el-menu-item>
-                        <el-menu-item index="4-1-3">飞行器</el-menu-item>
-                        <el-menu-item index="4-1-4">雷达</el-menu-item>
+                        <el-menu-item index="4-1-1" @click="navigateTo1()">全部</el-menu-item>
+                        <el-menu-item index="4-1-2" @click="navigateTo1()">舰船</el-menu-item>
+                        <el-menu-item index="4-1-3" @click="navigateTo1()">飞行器</el-menu-item>
+                        <el-menu-item index="4-1-4" @click="navigateTo1()">雷达</el-menu-item>
                         <el-submenu index="4-1-5">
                             <template slot="title">固定目标</template>
-                            <el-menu-item index="4-1-5-1">基地</el-menu-item>
-                            <el-menu-item index="4-1-5-2">电厂</el-menu-item>
-                            <el-menu-item index="4-1-5-3">机场</el-menu-item>
+                            <el-menu-item index="4-1-5-1" @click="navigateTo1()">基地</el-menu-item>
+                            <el-menu-item index="4-1-5-2" @click="navigateTo1()">电厂</el-menu-item>
+                            <el-menu-item index="4-1-5-3" @click="navigateTo1()">机场</el-menu-item>
                         </el-submenu>
                     </el-submenu>
                     <el-submenu index="4-2">
                         <template slot="title">百科数据</template>
-                        <el-menu-item index="4-2-1">全部</el-menu-item>
-                        <el-menu-item index="4-2-2">舰船</el-menu-item>
-                        <el-menu-item index="4-2-3">飞行器</el-menu-item>
-                        <el-menu-item index="4-2-4">雷达</el-menu-item>
+                        <el-menu-item index="4-2-1" @click="navigateTo1()">全部</el-menu-item>
+                        <el-menu-item index="4-2-2" @click="navigateTo1()">舰船</el-menu-item>
+                        <el-menu-item index="4-2-3" @click="navigateTo1()">飞行器</el-menu-item>
+                        <el-menu-item index="4-2-4" @click="navigateTo1()">雷达</el-menu-item>
                         <el-submenu index="4-2-5">
                             <template slot="title">固定目标</template>
-                            <el-menu-item index="4-2-5-1">基地</el-menu-item>
-                            <el-menu-item index="4-2-5-2">电厂</el-menu-item>
-                            <el-menu-item index="4-2-5-3">机场</el-menu-item>
+                            <el-menu-item index="4-2-5-1" @click="navigateTo1()">基地</el-menu-item>
+                            <el-menu-item index="4-2-5-2" @click="navigateTo1()">电厂</el-menu-item>
+                            <el-menu-item index="4-2-5-3" @click="navigateTo1()">机场</el-menu-item>
                         </el-submenu>
                     </el-submenu>
                     <el-submenu index="4-3">
                         <template slot="title">文档数据</template>
-                        <el-menu-item index="4-3-1">全部</el-menu-item>
-                        <el-menu-item index="4-3-2">舰船</el-menu-item>
-                        <el-menu-item index="4-3-3">飞行器</el-menu-item>
-                        <el-menu-item index="4-3-4">雷达</el-menu-item>
+                        <el-menu-item index="4-3-1" @click="navigateTo1()">全部</el-menu-item>
+                        <el-menu-item index="4-3-2" @click="navigateTo1()">舰船</el-menu-item>
+                        <el-menu-item index="4-3-3" @click="navigateTo1()">飞行器</el-menu-item>
+                        <el-menu-item index="4-3-4" @click="navigateTo1()">雷达</el-menu-item>
                         <el-submenu index="4-3-5">
                             <template slot="title">固定目标</template>
-                            <el-menu-item index="4-3-5-1">基地</el-menu-item>
-                            <el-menu-item index="4-3-5-2">电厂</el-menu-item>
-                            <el-menu-item index="4-3-5-3">机场</el-menu-item>
+                            <el-menu-item index="4-3-5-1" @click="navigateTo1()">基地</el-menu-item>
+                            <el-menu-item index="4-3-5-2" @click="navigateTo1()">电厂</el-menu-item>
+                            <el-menu-item index="4-3-5-3" @click="navigateTo1()">机场</el-menu-item>
                         </el-submenu>
                     </el-submenu>
                     <el-menu-item index="/dataReview/networkwideEnd">
@@ -291,6 +291,34 @@ export default {
       }
       // 导航到指定路径
       this.$router.push({name:'Index1',params:{params}});
+    },
+    navigateTo1() {
+      // 获取被点击的菜单项
+      const menuItem = event.target;
+      // 获取菜单项的标题
+      const itemTitle = menuItem.innerText.trim();
+      // 获取父级菜单的标题
+      let parentTitle = '';
+      let parentElement1 = menuItem.closest('.el-submenu');
+      if (parentElement1) {
+        const titleElement = parentElement1.querySelector('.el-submenu__title');
+        if (titleElement) {
+          parentTitle = titleElement.innerText.trim();
+          if(parentTitle==='固定目标'){
+            let parentElement2 =parentElement1.parentElement.parentElement;
+            console.log(parentElement2)
+            let titleElement2 = parentElement2.querySelector('.el-submenu__title');
+            console.log(titleElement2)
+            parentTitle = titleElement2.innerText.trim();
+          }
+        }
+      }
+      let params = {
+        parentTitles:parentTitle,
+        itemTitles:itemTitle
+      }
+      // 导航到指定路径
+      this.$router.push({name:'reviewList',params:{params}});
     }
     },
     components: { SidebarItem, Logo },

@@ -158,6 +158,7 @@
 <script>
 import { labelNewsList,getinitDocType,getInitDocCategory,pullData } from "@/api/datalabel/label";
 export default {
+  props:['params'],
   name: "dataLabel",
   created(){
     let params ={
@@ -175,6 +176,33 @@ export default {
     // }
   },
   mounted(){
+    if(this.params){
+        if(this.params.itemTitles=='丢弃数据'){
+        this.isDropData = false
+        this.pageStatus = 4
+        }else{
+            if(this.params.itemTitles=='相似数据'){
+                if(this.params.itemTitles == '全部'){
+                    this.queryParams.dataType = ''
+                }else{
+                    this.queryParams.dataType = this.params.itemTitles
+                }
+            }else{
+                this.queryParams.docType = this.params.parentTitles
+                if(this.params.itemTitles == '全部'){
+                    this.queryParams.dataType = ''
+                }else{
+                    this.queryParams.dataType = this.params.itemTitles
+                }
+            } 
+        }
+        let params = {
+            docType:this.params.parentTitles
+        }
+        getInitDatasourceName(params).then(res=>{
+            this.initDocNameList = res.data
+        })
+    }
     const savedSearchCriteria = sessionStorage.getItem('searchCriteria');
     if (sessionStorage.getItem('fromDetail') && savedSearchCriteria) {
       this.queryParams = JSON.parse(savedSearchCriteria);
@@ -209,7 +237,7 @@ export default {
             dataType:'',
             docType:'',
             publishtime:[],
-            docStatus:1,
+            docStatus:6,
             createTime:[]
         },
         labelPosition:'right',

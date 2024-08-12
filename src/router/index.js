@@ -220,6 +220,20 @@ export const constantRoutes = [
         component: () => import('@/views/dataReview/networkwideEnd'),
         name: 'networkwideEnd',
         meta: { title: '全网端数据'}
+      },
+      {
+        path: 'reviewList',
+        component: () => import('@/views/dataReview/dataList'),
+        name: 'reviewList',
+        meta: { title: '审核列表'},
+        props: true
+      },
+      {
+        path: 'reviewContent',
+        component: () => import('@/views/dataReview/newsDetail'),
+        name: 'reviewContent',
+        meta: { title: '审核内容'},
+        props: true
       }
     ]
   }
