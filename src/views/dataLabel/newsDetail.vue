@@ -267,9 +267,9 @@
                           </div>
                           <label  @click="handleCustomLabelClick(index)" style="width: 70px;text-align: right;margin-right: 35px;cursor: pointer;">{{form.name}}</label>
                           <div style="display: flex;justify-content: flex-start;flex-wrap:wrap;flex:1">
-                            <div v-for="url in form.fileList" :key="url.uid" style="margin-right: 10px;">
+                            <div v-for="(url,index7) in form.fileList" :key="index7" style="margin-right: 10px;">
                               <el-image
-                                v-if="form.picturePathList"
+                                v-if="form.fileList"
                                 style="width: 80px; height: 80px"
                                 :src="url.url">
                               </el-image>
@@ -476,6 +476,7 @@ export default {
           entityName:'',
           text:''
         },
+        testList:[],
         propFormDataTemp:[],
         dialogImageUrl:'',
         disabled:false,
@@ -1140,7 +1141,6 @@ export default {
         this.imageDialogVisible = true;
     },
     handleSuccess(response, file, fileList, index) {
-      console.log(fileList)
       let saveTripletReqListTemp = []
       saveTripletReqListTemp.push({
           object:response.data,
@@ -1161,10 +1161,11 @@ export default {
       saveTriplets(params).then(res=>{
         if(res.code == 200){
             this.$message.success('上传成功！')
-            this.propForm[index].fileList.push({
-              uid : res.data[0],
-              url : 'http://localhost:8081'+response.data,
-            })
+            this.$set(this.propForm[index].fileList, this.propForm[index].fileList.length, {
+              uid: res.data[0],
+              url: 'http://localhost:8081' + response.data,
+            });
+            console.log(this.propForm[index])
             this.propForm[index].propertyValueList.push({
                 id:res.data[0],
                 object:response.data,
@@ -1358,7 +1359,6 @@ export default {
     },
     handleCancelImageEdit(index){
       this.$set(this.propForm, index, { ...this.propForm[index], editing: false });
-      console.log(this.propForm[index].fileList)
     },
     handleRemove(file, fileList, index){
       if (file.status === "success") {
@@ -1459,6 +1459,7 @@ export default {
       })
     },
     saveTripletPropValueListImage(index){
+      console.log(this.propForm[index].propertyValueList)
       let saveTripletReqListTemp = []
       this.propForm[index].propertyValueList.forEach(item => {
         saveTripletReqListTemp.push({
@@ -1532,6 +1533,7 @@ export default {
       saveTriplets(params).then(res=>{
         if(res.code == 200){
           this.$set(this.propForm, index, { ...this.propForm[index], editing: false });
+          this.$set(this.propFormDataTemp, index, { ...this.propFormDataTemp[index], propertyValueList: JSON.parse(JSON.stringify(this.propForm[index].propertyValueList)) });
           for(let i =0;i<res.data.length;i++){
             this.$set(this.propForm[index].propertyValueList, i, { ...this.propForm[index].propertyValueList[i], id: res.data[i] });
           }  
@@ -1545,8 +1547,9 @@ export default {
       this.dialogFormVisible =true
     },
     handleCustomLabelClick(index){
+      console.log(this.propForm[index].propertyValueList)
       this.$set(this.propForm, index, { ...this.propForm[index], editing: true });
-      if (this.propForm[index].propertyValueList.length === 0) {
+      if (this.propForm[index].propertyValueList.length === 0 && this.propForm[index].dataType !=='PICTURE') {
         this.propForm[index].propertyValueList.push({ object: '', tripleText: '',comment:'',isCustomUnit:false,chosenUnit:this.propFormDataTemp[index].defaultUnit,isTransText:false });
       }
     },
