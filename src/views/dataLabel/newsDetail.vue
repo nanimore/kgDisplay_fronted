@@ -183,10 +183,10 @@
                           <div v-for="(form1,index1) in form.propertyValueList" :key="'form1-' + index1">
                             <el-form :model="form1" ref="form1" class="propFormClass">
                                   <img v-if="!form1.isTransText" src="../../assets/images/u1933.svg" style="width: 15px;height: 15px;cursor: pointer;margin-right: 10px;" @click="getPropListSelectedTextObject(index,index1)">
-                                  <el-input v-if="!form1.isTransText" v-model="form1.object" style="width: 150px;display: inline-block;"></el-input>
-                                  <el-input v-if="form1.isTransText" v-model="form1.objectStart" style="width: 45px;display: inline-block;margin-left: 5px;"></el-input>
+                                  <el-input v-if="!form1.isTransText" v-model="form1.object"  style="width: 150px;display: inline-block;"></el-input>
+                                  <el-input v-if="form1.isTransText" v-model="form1.objectStart" style="width: 55px;display: inline-block;margin-left: 5px;"></el-input>
                                   <span v-if="form1.isTransText" style="margin-left:5px">—</span>
-                                  <el-input v-if="form1.isTransText" v-model="form1.objectEnd" style="width: 45px;display: inline-block;margin-left: 5px;"></el-input>
+                                  <el-input v-if="form1.isTransText" v-model="form1.objectEnd" style="width: 55px;display: inline-block;margin-left: 5px;"></el-input>
                                   <el-select v-if="form.unit.length && !form1.isCustomUnit" v-model="form1.chosenUnit" style="width: 85px;margin-left: 15px;" size="mini"> 
                                       <el-option v-for="item in form.unit" :key="item" :label="item" :value="item"></el-option>
                                   </el-select>
@@ -1589,6 +1589,15 @@ export default {
   },
   computed: {
   },
+  directives: {
+    trim: {
+      update(el, binding, vnode) {
+        console.log(vnode)
+        const value = binding.value.replace(/[@#]/g, '-');
+        vnode.context[binding.expression] = value;
+      },
+    },
+  },
 };
 </script>
 
@@ -1844,6 +1853,10 @@ export default {
     color: #D9001B;
     background-color: #111725;
   }
+}
+::v-deep .clsSt{
+  color: black;
+  rt{color: white;}
 }
 .propFormClass{
   .el-form-item{
